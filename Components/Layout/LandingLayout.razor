@@ -1,0 +1,21 @@
+﻿@inherits LayoutComponentBase
+
+<div style="display:grid;grid-template-rows:auto 1fr;width:100%;height:100vh;">
+    <nav class="navbar bg-body-tertiary bg-black p-4">
+        <div class="container-fluid">
+            <a class="navbar-brand">Navbar</a>
+            <form class="d-flex">
+                <button class="btn btn-outline-success me-2" type="button">Sign in</button>
+                <button class="btn btn-sm btn-outline-secondary" type="button">Register Here</button>
+            </form>
+        </div>
+    </nav>
+    <div class="container-fluid body-container">
+        @Body
+    </div>
+</div>
+
+
+@code {
+
+}

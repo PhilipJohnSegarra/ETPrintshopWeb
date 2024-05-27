@@ -1,0 +1,6 @@
+﻿.body-container{
+    background-image: url("LandingPageImage.png");
+    background-repeat:no-repeat;
+    background-size:cover;
+    height:100%;
+}
