@@ -12,12 +12,12 @@
 </p>
 
 <QuickGrid Class="table" Items="DB.RequisitionForms">
-    <PropertyColumn Property="requisitionform => requisitionform.JONumber" />
-    <PropertyColumn Property="requisitionform => requisitionform.DateRequested" />
+    <PropertyColumn Title="Date Created" Property="requisitionform => requisitionform.DateRequested" />
+    <PropertyColumn Title="JO No." Property="requisitionform => requisitionform.JONumber" />
     <PropertyColumn Property="requisitionform => requisitionform.DeliveryDate" />
     <PropertyColumn Property="requisitionform => requisitionform.Status" />
-    <PropertyColumn Property="requisitionform => requisitionform.ReceivedBy" />
-    <PropertyColumn Property="requisitionform => requisitionform.ApprovedBy" />
+@*     <PropertyColumn Property="requisitionform => requisitionform.ReceivedBy" />
+    <PropertyColumn Property="requisitionform => requisitionform.ApprovedBy" /> *@
 
     <TemplateColumn Context="requisitionform">
         <a href="@($"requisitionforms/edit?id={requisitionform.Id}")">Edit</a> |
