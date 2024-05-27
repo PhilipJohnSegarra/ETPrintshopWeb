@@ -1,0 +1,28 @@
+﻿@page "/suppliers"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="suppliers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Suppliers">
+    <PropertyColumn Property="supplier => supplier.Name" />
+    <PropertyColumn Property="supplier => supplier.ContactPerson" />
+    <PropertyColumn Property="supplier => supplier.Email" />
+    <PropertyColumn Property="supplier => supplier.ContactNumber" />
+    <PropertyColumn Property="supplier => supplier.Address" />
+    <PropertyColumn Property="supplier => supplier.Status" />
+    <PropertyColumn Property="supplier => supplier.DateAdded" />
+
+    <TemplateColumn Context="supplier">
+        <a href="@($"suppliers/edit?id={supplier.Id}")">Edit</a> |
+        <a href="@($"suppliers/details?id={supplier.Id}")">Details</a> |
+        <a href="@($"suppliers/delete?id={supplier.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

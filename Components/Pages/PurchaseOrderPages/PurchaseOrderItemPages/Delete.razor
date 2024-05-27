@@ -1,0 +1,69 @@
+﻿@page "/purchaseorderitems/delete"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>PurchaseOrderItem</h4>
+    <hr />
+    @if (purchaseorderitem is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Item</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Item</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Quantity</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Unit</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Unit</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Price</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Description</dd>
+        </dl>
+        <EditForm method="post" Model="purchaseorderitem" OnValidSubmit="DeletePurchaseOrderItem" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(purchaseorderitem is null)">Delete</button> |
+            <a href="/purchaseorderitems">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    PurchaseOrderItem? purchaseorderitem;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        purchaseorderitem = await DB.PurchaseOrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (purchaseorderitem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeletePurchaseOrderItem()
+    {
+        DB.PurchaseOrderItems.Remove(purchaseorderitem!);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/purchaseorderitems");
+    }
+}

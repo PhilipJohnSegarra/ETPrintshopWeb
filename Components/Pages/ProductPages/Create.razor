@@ -1,0 +1,68 @@
+﻿@page "/products/create"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Product" OnValidSubmit="AddProduct" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Product.Name" class="form-control" /> 
+                <ValidationMessage For="() => Product.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label> 
+                <InputText id="category" @bind-Value="Product.Category" class="form-control" /> 
+                <ValidationMessage For="() => Product.Category" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="brandname" class="form-label">BrandName:</label> 
+                <InputText id="brandname" @bind-Value="Product.BrandName" class="form-control" /> 
+                <ValidationMessage For="() => Product.BrandName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="model" class="form-label">Model:</label> 
+                <InputText id="model" @bind-Value="Product.Model" class="form-control" /> 
+                <ValidationMessage For="() => Product.Model" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="stocks" class="form-label">Stocks:</label> 
+                <InputNumber id="stocks" @bind-Value="Product.Stocks" class="form-control" /> 
+                <ValidationMessage For="() => Product.Stocks" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="Product.Price" class="form-control" /> 
+                <ValidationMessage For="() => Product.Price" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/products">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Product Product { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddProduct()
+    {
+        DB.Products.Add(Product);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/products");
+    }
+}

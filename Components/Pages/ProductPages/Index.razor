@@ -1,0 +1,27 @@
+﻿@page "/products"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="products/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Products">
+    <PropertyColumn Property="product => product.Name" />
+    <PropertyColumn Property="product => product.Category" />
+    <PropertyColumn Property="product => product.BrandName" />
+    <PropertyColumn Property="product => product.Model" />
+    <PropertyColumn Property="product => product.Stocks" />
+    <PropertyColumn Property="product => product.Price" />
+
+    <TemplateColumn Context="product">
+        <a href="@($"products/edit?id={product.Id}")">Edit</a> |
+        <a href="@($"products/details?id={product.Id}")">Details</a> |
+        <a href="@($"products/delete?id={product.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

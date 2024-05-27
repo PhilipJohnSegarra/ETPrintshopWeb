@@ -1,0 +1,57 @@
+﻿@page "/suppliers/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Supplier</h4>
+    <hr />
+    @if (supplier is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@supplier.Name</dd>
+            <dt class="col-sm-2">ContactPerson</dt>
+            <dd class="col-sm-10">@supplier.ContactPerson</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@supplier.Email</dd>
+            <dt class="col-sm-2">ContactNumber</dt>
+            <dd class="col-sm-10">@supplier.ContactNumber</dd>
+            <dt class="col-sm-2">Address</dt>
+            <dd class="col-sm-10">@supplier.Address</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@supplier.Status</dd>
+            <dt class="col-sm-2">DateAdded</dt>
+            <dd class="col-sm-10">@supplier.DateAdded</dd>
+        </dl>
+        <div>
+            <a href="@($"/suppliers/edit?id={supplier.Id}")">Edit</a> |
+            <a href="@($"/suppliers")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Supplier? supplier;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        supplier = await DB.Suppliers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (supplier is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

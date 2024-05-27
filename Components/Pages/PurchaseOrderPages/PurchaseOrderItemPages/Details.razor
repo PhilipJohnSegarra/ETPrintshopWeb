@@ -1,0 +1,53 @@
+﻿@page "/purchaseorderitems/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>PurchaseOrderItem</h4>
+    <hr />
+    @if (purchaseorderitem is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Item</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Item</dd>
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Quantity</dd>
+            <dt class="col-sm-2">Unit</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Unit</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Price</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@purchaseorderitem.Description</dd>
+        </dl>
+        <div>
+            <a href="@($"/purchaseorderitems/edit?id={purchaseorderitem.Id}")">Edit</a> |
+            <a href="@($"/purchaseorderitems")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    PurchaseOrderItem? purchaseorderitem;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        purchaseorderitem = await DB.PurchaseOrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (purchaseorderitem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

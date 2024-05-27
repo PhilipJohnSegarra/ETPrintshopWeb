@@ -1,0 +1,111 @@
+﻿@page "/RequisitionForms/edit"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>RequisitionForm</h4>
+<hr />
+@if (RequisitionForm is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="RequisitionForm" OnValidSubmit="UpdateRequisitionForm" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="RequisitionForm.Id" value="@RequisitionForm.Id" />
+                <div class="mb-3">
+                    <label for="jonumber" class="form-label">JONumber:</label>
+                    <InputText id="jonumber" @bind-Value="RequisitionForm.JONumber" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.JONumber" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="daterequested" class="form-label">DateRequested:</label>
+                    <InputDate id="daterequested" @bind-Value="RequisitionForm.DateRequested" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.DateRequested" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="deliverydate" class="form-label">DeliveryDate:</label>
+                    <InputDate id="deliverydate" @bind-Value="RequisitionForm.DeliveryDate" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.DeliveryDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <InputText id="status" @bind-Value="RequisitionForm.Status" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.Status" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="receivedby" class="form-label">ReceivedBy:</label>
+                    <InputText id="receivedby" @bind-Value="RequisitionForm.ReceivedBy" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.ReceivedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="approvedby" class="form-label">ApprovedBy:</label>
+                    <InputText id="approvedby" @bind-Value="RequisitionForm.ApprovedBy" class="form-control" />
+                    <ValidationMessage For="() => RequisitionForm.ApprovedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/requisitionforms">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public RequisitionForm? RequisitionForm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RequisitionForm ??= await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (RequisitionForm is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateRequisitionForm()
+    {
+        DB.Attach(RequisitionForm!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RequisitionFormExists(RequisitionForm!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/requisitionforms");
+    }
+
+    bool RequisitionFormExists(int? id)
+    {
+        return DB.RequisitionForms.Any(e => e.Id == id);
+    }
+}

@@ -2,10 +2,10 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">ETPrintshopWeb</a>
-    </div>
+<div class="top-row p-3">
+    <a class="navbar-brand" href="">
+        <img class="img-fluid" src="ETLOGO.png" alt="ET printshop logo"/>
+    </a>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
@@ -14,27 +14,39 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="requisitionforms">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Requisition
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="purchaseorders">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Purchase Orders
             </NavLink>
         </div>
 
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="products">
+                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Inventory
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="suppliers">
+                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Suppliers
+            </NavLink>
+        </div>
+@* 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="auth">
                 <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
             </NavLink>
-        </div>
+        </div> *@
 
         <AuthorizeView>
             <Authorized>

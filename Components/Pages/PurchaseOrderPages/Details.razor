@@ -1,0 +1,47 @@
+﻿@page "/purchaseorders/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>PurchaseOrder</h4>
+    <hr />
+    @if (purchaseorder is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@purchaseorder.Status</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@purchaseorder.DateCreated</dd>
+        </dl>
+        <div>
+            <a href="@($"/purchaseorders/edit?id={purchaseorder.Id}")">Edit</a> |
+            <a href="@($"/purchaseorders")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    PurchaseOrder? purchaseorder;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        purchaseorder = await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (purchaseorder is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,24 @@
+﻿@page "/requisitionitems"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="requisitionitems/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.RequisitionItems">
+    <PropertyColumn Property="requisitionitem => requisitionitem.CTR" />
+    <PropertyColumn Property="requisitionitem => requisitionitem.Quantity" />
+    <PropertyColumn Property="requisitionitem => requisitionitem.Particular" />
+
+    <TemplateColumn Context="requisitionitem">
+        <a href="@($"requisitionitems/edit?id={requisitionitem.Id}")">Edit</a> |
+        <a href="@($"requisitionitems/details?id={requisitionitem.Id}")">Details</a> |
+        <a href="@($"requisitionitems/delete?id={requisitionitem.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

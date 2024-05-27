@@ -1,0 +1,91 @@
+﻿@page "/PurchaseOrders/edit"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>PurchaseOrder</h4>
+<hr />
+@if (PurchaseOrder is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="PurchaseOrder" OnValidSubmit="UpdatePurchaseOrder" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="PurchaseOrder.Id" value="@PurchaseOrder.Id" />
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status:</label>
+                    <InputText id="status" @bind-Value="PurchaseOrder.Status" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.Status" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="PurchaseOrder.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.DateCreated" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/purchaseorders">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public PurchaseOrder? PurchaseOrder { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PurchaseOrder ??= await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (PurchaseOrder is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdatePurchaseOrder()
+    {
+        DB.Attach(PurchaseOrder!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PurchaseOrderExists(PurchaseOrder!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/purchaseorders");
+    }
+
+    bool PurchaseOrderExists(int? id)
+    {
+        return DB.PurchaseOrders.Any(e => e.Id == id);
+    }
+}

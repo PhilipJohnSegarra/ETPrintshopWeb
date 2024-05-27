@@ -1,0 +1,49 @@
+﻿@page "/requisitionitems/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>RequisitionItem</h4>
+    <hr />
+    @if (requisitionitem is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">CTR</dt>
+            <dd class="col-sm-10">@requisitionitem.CTR</dd>
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@requisitionitem.Quantity</dd>
+            <dt class="col-sm-2">Particular</dt>
+            <dd class="col-sm-10">@requisitionitem.Particular</dd>
+        </dl>
+        <div>
+            <a href="@($"/requisitionitems/edit?id={requisitionitem.Id}")">Edit</a> |
+            <a href="@($"/requisitionitems")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    RequisitionItem? requisitionitem;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        requisitionitem = await DB.RequisitionItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (requisitionitem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

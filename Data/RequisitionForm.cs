@@ -7,7 +7,7 @@ namespace ETPrintshopWeb.Data
     {
         [Key]
         public int? Id { get; set; }
-
+        public string? JONumber { get; set; }
         [DataType(DataType.DateTime),Required]
         public DateTime? DateRequested { get; set; } = DateTime.Now.Date;
         public DateTime? DeliveryDate { get; set; }

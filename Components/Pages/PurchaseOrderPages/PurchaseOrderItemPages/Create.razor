@@ -1,0 +1,65 @@
+﻿@page "/purchaseorderitems/create"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>PurchaseOrderItem</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="PurchaseOrderItem" OnValidSubmit="AddPurchaseOrderItem" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="item" class="form-label">Item:</label> 
+                <InputText id="item" @bind-Value="PurchaseOrderItem.Item" class="form-control" /> 
+                <ValidationMessage For="() => PurchaseOrderItem.Item" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity:</label> 
+                <InputNumber id="quantity" @bind-Value="PurchaseOrderItem.Quantity" class="form-control" /> 
+                <ValidationMessage For="() => PurchaseOrderItem.Quantity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="unit" class="form-label">Unit:</label> 
+                <InputText id="unit" @bind-Value="PurchaseOrderItem.Unit" class="form-control" /> 
+                <ValidationMessage For="() => PurchaseOrderItem.Unit" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label> 
+                <InputNumber id="price" @bind-Value="PurchaseOrderItem.Price" class="form-control" /> 
+                <ValidationMessage For="() => PurchaseOrderItem.Price" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="PurchaseOrderItem.Description" class="form-control" /> 
+                <ValidationMessage For="() => PurchaseOrderItem.Description" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/purchaseorderitems">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public PurchaseOrderItem PurchaseOrderItem { get; set; } = new();
+
+    
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddPurchaseOrderItem()
+    {
+        DB.PurchaseOrderItems.Add(PurchaseOrderItem);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/purchaseorderitems");
+    }
+}

@@ -1,0 +1,68 @@
+﻿@page "/requisitionforms/create"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>RequisitionForm</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="RequisitionForm" OnValidSubmit="AddRequisitionForm" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="jonumber" class="form-label">JONumber:</label> 
+                <InputText id="jonumber" @bind-Value="RequisitionForm.JONumber" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.JONumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="daterequested" class="form-label">DateRequested:</label> 
+                <InputDate id="daterequested" @bind-Value="RequisitionForm.DateRequested" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.DateRequested" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="deliverydate" class="form-label">DeliveryDate:</label> 
+                <InputDate id="deliverydate" @bind-Value="RequisitionForm.DeliveryDate" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.DeliveryDate" class="text-danger" /> 
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label> 
+                <InputText id="status" @bind-Value="RequisitionForm.Status" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.Status" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="receivedby" class="form-label">ReceivedBy:</label> 
+                <InputText id="receivedby" @bind-Value="RequisitionForm.ReceivedBy" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.ReceivedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="approvedby" class="form-label">ApprovedBy:</label> 
+                <InputText id="approvedby" @bind-Value="RequisitionForm.ApprovedBy" class="form-control" /> 
+                <ValidationMessage For="() => RequisitionForm.ApprovedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/requisitionforms">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public RequisitionForm RequisitionForm { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddRequisitionForm()
+    {
+        DB.RequisitionForms.Add(RequisitionForm);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/requisitionforms");
+    }
+}

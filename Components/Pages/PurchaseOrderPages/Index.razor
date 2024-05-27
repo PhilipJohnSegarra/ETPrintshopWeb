@@ -1,0 +1,23 @@
+﻿@page "/purchaseorders"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+
+<PageTitle>Index</PageTitle>
+
+<h1>Purchase Orders</h1>
+
+<p>
+    <a href="purchaseorders/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.PurchaseOrders">
+    <PropertyColumn Property="purchaseorder => purchaseorder.Status" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.DateCreated" />
+
+    <TemplateColumn Context="purchaseorder">
+        <a href="@($"purchaseorders/edit?id={purchaseorder.Id}")">Edit</a> |
+        <a href="@($"purchaseorders/details?id={purchaseorder.Id}")">Details</a> |
+        <a href="@($"purchaseorders/delete?id={purchaseorder.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

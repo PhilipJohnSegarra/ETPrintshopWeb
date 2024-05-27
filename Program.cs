@@ -1,4 +1,4 @@
-using ETPrintshopWeb.Components;
+﻿using ETPrintshopWeb.Components;
 using ETPrintshopWeb.Components.Account;
 using ETPrintshopWeb.Data;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -26,6 +26,8 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddQuickGridEntityFrameworkAdapter();;
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -65,6 +67,9 @@ using (var scope = app.Services.CreateScope())
 {
     string[] roles = ["Admin", "Staff"];
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var UserStore = scope.ServiceProvider.GetRequiredService<IUserStore<ApplicationUser>>();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     foreach (var role in roles)
     {
@@ -73,6 +78,24 @@ using (var scope = app.Services.CreateScope())
             IdentityRole roleRole = new IdentityRole(role);
             await roleManager.CreateAsync(roleRole);
         }
+    }
+
+    var user = await userManager.FindByEmailAsync("Admin@etprintshop.com");
+    if (user == null)
+    {
+        var organizer = Activator.CreateInstance<ApplicationUser>();
+        // organizer account
+        await UserStore.SetUserNameAsync(organizer, "Admin@etprintshop.com", CancellationToken.None);
+        var emailStore = (IUserEmailStore<ApplicationUser>)UserStore;
+        await emailStore.SetEmailAsync(organizer, "Admin@etprintshop.com", CancellationToken.None);
+        var identityResult = await userManager.CreateAsync(organizer, "Admin123!");
+
+        if (identityResult.Succeeded)
+        {
+            // Put Admin@eventify.com in Organizer role
+            await userManager.AddToRoleAsync(organizer, "Admin");
+        }
+
     }
 }
 

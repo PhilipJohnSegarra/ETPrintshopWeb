@@ -1,0 +1,96 @@
+﻿@page "/RequisitionItems/edit"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>RequisitionItem</h4>
+<hr />
+@if (RequisitionItem is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="RequisitionItem" OnValidSubmit="UpdateRequisitionItem" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="RequisitionItem.Id" value="@RequisitionItem.Id" />
+                <div class="mb-3">
+                    <label for="ctr" class="form-label">CTR:</label>
+                    <InputText id="ctr" @bind-Value="RequisitionItem.CTR" class="form-control" />
+                    <ValidationMessage For="() => RequisitionItem.CTR" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="RequisitionItem.Quantity" class="form-control" />
+                    <ValidationMessage For="() => RequisitionItem.Quantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="particular" class="form-label">Particular:</label>
+                    <InputText id="particular" @bind-Value="RequisitionItem.Particular" class="form-control" />
+                    <ValidationMessage For="() => RequisitionItem.Particular" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/requisitionitems">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public RequisitionItem? RequisitionItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RequisitionItem ??= await DB.RequisitionItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (RequisitionItem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateRequisitionItem()
+    {
+        DB.Attach(RequisitionItem!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RequisitionItemExists(RequisitionItem!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/requisitionitems");
+    }
+
+    bool RequisitionItemExists(int? id)
+    {
+        return DB.RequisitionItems.Any(e => e.Id == id);
+    }
+}
