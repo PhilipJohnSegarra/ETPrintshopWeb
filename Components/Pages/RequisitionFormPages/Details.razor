@@ -1,0 +1,55 @@
+﻿@page "/requisitionforms/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>RequisitionForm</h4>
+    <hr />
+    @if (requisitionform is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">JONumber</dt>
+            <dd class="col-sm-10">@requisitionform.JONumber</dd>
+            <dt class="col-sm-2">DateRequested</dt>
+            <dd class="col-sm-10">@requisitionform.DateRequested</dd>
+            <dt class="col-sm-2">DeliveryDate</dt>
+            <dd class="col-sm-10">@requisitionform.DeliveryDate</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@requisitionform.Status</dd>
+            <dt class="col-sm-2">ReceivedBy</dt>
+            <dd class="col-sm-10">@requisitionform.ReceivedBy</dd>
+            <dt class="col-sm-2">ApprovedBy</dt>
+            <dd class="col-sm-10">@requisitionform.ApprovedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/requisitionforms/edit?id={requisitionform.Id}")">Edit</a> |
+            <a href="@($"/requisitionforms")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    RequisitionForm? requisitionform;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        requisitionform = await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (requisitionform is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
