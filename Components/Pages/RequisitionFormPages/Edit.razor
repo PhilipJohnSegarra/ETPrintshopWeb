@@ -3,12 +3,11 @@
 @using ETPrintshopWeb.Data
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>
-
-<h4>RequisitionForm</h4>
 <hr />
 @if (RequisitionForm is null)
 {
@@ -16,51 +15,101 @@
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="RequisitionForm" OnValidSubmit="UpdateRequisitionForm" FormName="edit" Enhance>
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <input type="hidden" name="RequisitionForm.Id" value="@RequisitionForm.Id" />
-                <div class="mb-3">
-                    <label for="jonumber" class="form-label">JONumber:</label>
-                    <InputText id="jonumber" @bind-Value="RequisitionForm.JONumber" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.JONumber" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="daterequested" class="form-label">DateRequested:</label>
-                    <InputDate id="daterequested" @bind-Value="RequisitionForm.DateRequested" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.DateRequested" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="deliverydate" class="form-label">DeliveryDate:</label>
-                    <InputDate id="deliverydate" @bind-Value="RequisitionForm.DeliveryDate" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.DeliveryDate" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status:</label>
-                    <InputText id="status" @bind-Value="RequisitionForm.Status" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.Status" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="receivedby" class="form-label">ReceivedBy:</label>
-                    <InputText id="receivedby" @bind-Value="RequisitionForm.ReceivedBy" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.ReceivedBy" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="approvedby" class="form-label">ApprovedBy:</label>
-                    <InputText id="approvedby" @bind-Value="RequisitionForm.ApprovedBy" class="form-control" />
-                    <ValidationMessage For="() => RequisitionForm.ApprovedBy" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </EditForm>
+    <div class="container-fluid p-3">
+        <a class="btn btn-outline-dark text-decoration-none" href="/requisitionforms">Back</a>
+        <hr />
+        <div class="row" style="overflow:auto;">
+            <div class="container-fluid" style="max-width:100%;min-width:760px;">
+                <EditForm method="post" Model="RequisitionForm" OnValidSubmit="UpdateRequisitionForm" FormName="create" Enhance style="width:100%;height:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:white; padding:1rem;">
+                    <h2 class="mb-3">E.T. Printshoppe</h2>
+                    <h4 class="mb-4">Requisition Form</h4>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
+                    <div class="mb-3 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                        <label for="jonumber" class="form-label">J.O.#:</label>
+                        <InputText id="jonumber" @bind-Value="RequisitionForm.JONumber" class="form-control" style="max-width:388px;" />
+                        <ValidationMessage For="() => RequisitionForm.JONumber" class="text-danger" />
+                    </div>
+                    <div class="mb-3 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                        <label for="daterequested" class="form-label">DateRequested:</label>
+                        <InputDate id="daterequested" @bind-Value="RequisitionForm.DateRequested" class="form-control" style="max-width:388px;" />
+                        <ValidationMessage For="() => RequisitionForm.DateRequested" class="text-danger" />
+                    </div>
+                    <div class="mb-4 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                        <label for="deliverydate" class="form-label">DeliveryDate:</label>
+                        <InputDate id="deliverydate" @bind-Value="RequisitionForm.DeliveryDate" class="form-control" style="max-width:388px;" />
+                        <ValidationMessage For="() => RequisitionForm.DeliveryDate" class="text-danger" />
+                    </div>
+                    <!--Adding of Items here-->
+                    <div class="container-fluid mb-5">
+                        <table class="table table-bordered container-fluid mb-3">
+                            <tr class="table-dark" style="background-color:#7C738F;">
+                                <th style="padding:1rem 0 1rem 1rem;">CTR</th>
+                                <th style="padding:1rem 0 1rem 1rem;">Quantity</th>
+                                <th style="padding:1rem 0 1rem 1rem;">Particulars</th>
+                            </tr>
+                            @foreach (var item in Items)
+                            {
+                                <tr class="table">
+                                    <td>
+                                        <input @bind="item.CTR" style="width:100%;" placeholder="Enter here" />
+                                    </td>
+                                    <td>
+                                        <input min="0" type="number" @bind="item.Quantity" style="width:100%;" placeholder="Enter here" />
+                                    </td>
+                                    <td>
+                                        <input @bind="item.Particular" style="width:100%;" placeholder="Enter here" />
+                                    </td>
+                                    <td>
+                                        <button class="btn" type="button" @onclick="() => {
+                                    Items.Remove(item);
+                                    RemovedItems.Add(item);
+                                }">
+                                            <img src="remove-icon.png" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                        <div class="container-fluid d-flex flex-column justify-content-between mb-5">
+                            <button class="btn d-flex flex-row justify-content-center align-items-center" style="margin:0 0 0 auto;border-color:#6A6728;color:#6A6728;" type="button" @onclick="()=>{
+                                           var item = new RequisitionItem();
+                                           Items.Add(item);StateHasChanged();
+                                      }">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6A6728" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                                </svg>
+                                Add Item
+                            </button>
+                        </div>
+                    </div>
+                    <div class="container-fluid d-flex flex-row justify-content-between mb-5">
+                        <div class="mb-3">
+                            <label for="preparedby" class="form-label">PreparedBy:</label>
+                            <InputText id="preparedby" @bind-Value="RequisitionForm.PreparedBy" class="form-control" />
+                            <ValidationMessage For="() => RequisitionForm.PreparedBy" class="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="receivedby" class="form-label">ReceivedBy:</label>
+                            <InputText id="receivedby" @bind-Value="RequisitionForm.ReceivedBy" class="form-control" />
+                            <ValidationMessage For="() => RequisitionForm.ReceivedBy" class="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="approvedby" class="form-label">ApprovedBy:</label>
+                            <InputText id="approvedby" @bind-Value="RequisitionForm.ApprovedBy" class="form-control" />
+                            <ValidationMessage For="() => RequisitionForm.ApprovedBy" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="container-fluid d-flex flex-row justify-content-between">
+                        <a class="btn btn-outline-dark text-decoration-none" href="/requisitionforms">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+                </EditForm>
+            </div>
         </div>
     </div>
 }
-
-<div>
-    <a href="/requisitionforms">Back to List</a>
-</div>
 
 @code {
     [SupplyParameterFromQuery]
@@ -69,10 +118,13 @@ else
     [SupplyParameterFromForm]
     public RequisitionForm? RequisitionForm { get; set; }
 
+    public List<RequisitionItem> Items { get; set; } = new();
+    public List<RequisitionItem> RemovedItems { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         RequisitionForm ??= await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
-
+        Items = DB.RequisitionItems.Where(i => i.RequisitionForm == RequisitionForm).ToList();
         if (RequisitionForm is null)
         {
             NavigationManager.NavigateTo("notfound");
@@ -87,7 +139,18 @@ else
 
         try
         {
+            foreach(var item in Items)
+            {
+                var currentitem = await DB.RequisitionItems.SingleAsync(i => i.Id == item.Id);
+                DB.RequisitionItems.Update(currentitem);
+            }
+            foreach(var item in RemovedItems)
+            {
+                var currentitem = await DB.RequisitionItems.SingleAsync(i => i.Id == item.Id);
+                DB.RequisitionItems.Remove(currentitem);
+            }
             await DB.SaveChangesAsync();
+            StateHasChanged();
         }
         catch (DbUpdateConcurrencyException)
         {

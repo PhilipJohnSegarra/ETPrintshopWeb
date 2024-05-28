@@ -5,23 +5,55 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Requisitions</h1>
+<div class="container-fluid" style="width:95%;height:100%;background-color:white;padding:2rem;">
+    <h1>Requisitions</h1>
 
-<p>
-    <a href="requisitionforms/create">Create New</a>
-</p>
+    <p>
+        <a class="btn btn-info text-light" href="requisitionforms/create">Create New</a>
+    </p>
 
-<QuickGrid Class="table" Items="DB.RequisitionForms">
-    <PropertyColumn Title="Date Created" Property="requisitionform => requisitionform.DateRequested" />
-    <PropertyColumn Title="JO No." Property="requisitionform => requisitionform.JONumber" />
-    <PropertyColumn Property="requisitionform => requisitionform.DeliveryDate" />
-    <PropertyColumn Property="requisitionform => requisitionform.Status" />
-@*     <PropertyColumn Property="requisitionform => requisitionform.ReceivedBy" />
-    <PropertyColumn Property="requisitionform => requisitionform.ApprovedBy" /> *@
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;">
+        <thead style="background-color:#7C738F;">
+            <tr>
+                <th style="color:white;padding:8px 0 8px 8px;">Date Created</th>
+                <th style="color:white;padding:8px 0 8px 8px;">J.O. #</th>
+                <th style="color:white;padding:8px 0 8px 8px;">Delivery Date</th>
+                <th style="color:white;padding:8px 0 8px 8px;">Status</th>
+                <th style="color:white;padding:8px 0 8px 8px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var rf in RequisitionForms)
+            {
+                <tr style="border:1px solid black;">
+                    <td>
+                        @rf.DateRequested
+                    </td>
+                    <td>
+                        @rf.JONumber
+                    </td>
+                    <td>
+                        @rf.DeliveryDate
+                    </td>
+                    <td>
+                        @rf.Status
+                    </td>
+                    <td>
+                        <a href="@($"requisitionforms/edit?id={rf.Id}")"><img src="edit-icon.png"/></a> |
+                        <a href="@($"requisitionforms/details?id={rf.Id}")">Details</a> |
+                        <a href="@($"requisitionforms/delete?id={rf.Id}")"><img src="remove-icon.png"/></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-    <TemplateColumn Context="requisitionform">
-        <a href="@($"requisitionforms/edit?id={requisitionform.Id}")">Edit</a> |
-        <a href="@($"requisitionforms/details?id={requisitionform.Id}")">Details</a> |
-        <a href="@($"requisitionforms/delete?id={requisitionform.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+</div>
+
+@code{
+    public List<RequisitionForm> RequisitionForms {get;set;} = new();
+
+    protected override void OnInitialized(){
+        RequisitionForms = DB.RequisitionForms.ToList();
+    }
+}
