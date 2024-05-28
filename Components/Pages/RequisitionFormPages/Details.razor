@@ -9,30 +9,75 @@
 <h1>Details</h1>
 
 <div>
-    <h4>RequisitionForm</h4>
+    <h4>requisitionform</h4>
     <hr />
     @if (requisitionform is null)
     {
         <p><em>Loading...</em></p>
     }
     else {
-        <dl class="row">
-            <dt class="col-sm-2">JONumber</dt>
-            <dd class="col-sm-10">@requisitionform.JONumber</dd>
-            <dt class="col-sm-2">DateRequested</dt>
-            <dd class="col-sm-10">@requisitionform.DateRequested</dd>
-            <dt class="col-sm-2">DeliveryDate</dt>
-            <dd class="col-sm-10">@requisitionform.DeliveryDate</dd>
-            <dt class="col-sm-2">Status</dt>
-            <dd class="col-sm-10">@requisitionform.Status</dd>
-            <dt class="col-sm-2">ReceivedBy</dt>
-            <dd class="col-sm-10">@requisitionform.ReceivedBy</dd>
-            <dt class="col-sm-2">ApprovedBy</dt>
-            <dd class="col-sm-10">@requisitionform.ApprovedBy</dd>
-        </dl>
-        <div>
-            <a href="@($"/requisitionforms/edit?id={requisitionform.Id}")">Edit</a> |
-            <a href="@($"/requisitionforms")">Back to List</a>
+        <div class="container-fluid p-3">
+            <a class="btn btn-outline-dark text-decoration-none" href="/requisitionforms">Back</a>
+            <hr />
+            <div class="row" style="overflow:auto;">
+                <div class="container-fluid" style="max-width:100%;min-width:760px;">
+                    <div style="width:100%;height:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:white; padding:1rem;">
+                        <h2 class="mb-3">E.T. Printshoppe</h2>
+                        <h4 class="mb-4">Requisition Form</h4>
+                        <div class="mb-3 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                            <label for="jonumber" class="form-label">J.O.#:</label>
+                            <input disabled="true" id="jonumber" value="@requisitionform.JONumber" class="form-control" style="max-width:388px;" />
+                        </div>
+                        <div class="mb-3 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                            <label for="daterequested" class="form-label">DateRequested:</label>
+                            <input disabled="true" id="daterequested" value="@requisitionform.DateRequested" class="form-control" style="max-width:388px;" />
+                        </div>
+                        <div class="mb-4 container-fluid" style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;max-width:600px;">
+                            <label for="deliverydate" class="form-label">DeliveryDate:</label>
+                            <input disabled="true" id="deliverydate" value="@requisitionform.DeliveryDate" class="form-control" style="max-width:388px;" />
+                        </div>
+                        <!--Adding of Items here-->
+                        <div class="container-fluid mb-5">
+                            <table class="table table-bordered container-fluid mb-3">
+                                <tr class="" style="background-color:#7C738F;">
+                                    <th style="padding:1rem 0 1rem 1rem;color:white;">CTR</th>
+                                    <th style="padding:1rem 0 1rem 1rem;color:white;">Quantity</th>
+                                    <th style="padding:1rem 0 1rem 1rem;color:white;">Particulars</th>
+                                </tr>
+                                @foreach (var item in Items)
+                                {
+                                    <tr class="table">
+                                        <td>
+                                            <input disabled="true" @bind="item.CTR" style="width:100%;border:none;background-color:transparent;" placeholder="Enter here" />
+                                        </td>
+                                        <td>
+                                            <input disabled="true" min="0" type="number" @bind="item.Quantity" style="width:100%;border:none;background-color:transparent;" placeholder="Enter here" />
+                                        </td>
+                                        <td>
+                                            <input disabled="true" @bind="item.Particular" style="width:100%;border:none;background-color:transparent;" placeholder="Enter here" />
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                        <div class="container-fluid d-flex flex-row justify-content-between mb-5">
+                            <div class="mb-3">
+                                <label for="receivedby" class="form-label">ReceivedBy:</label>
+                                <input disabled="true" id="receivedby" value="@requisitionform.ReceivedBy" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="approvedby" class="form-label">ApprovedBy:</label>
+                                <input disabled="true" id="approvedby" value="@requisitionform.ApprovedBy" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="container-fluid d-flex flex-row justify-content-between">
+                            <a class="btn btn-outline-dark text-decoration-none" href="/requisitionforms">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>
@@ -43,9 +88,12 @@
     [SupplyParameterFromQuery]
     public int? Id { get; set; }
 
+    public List<RequisitionItem> Items { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         requisitionform = await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
+        Items = DB.RequisitionItems.Where(i => i.RequisitionForm == requisitionform).ToList();
 
         if (requisitionform is null)
         {

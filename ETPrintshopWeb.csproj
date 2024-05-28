@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Components\Layout\LandingLayoutComponents\" />
+    <Folder Include="DataServices\" />
   </ItemGroup>
 
 </Project>

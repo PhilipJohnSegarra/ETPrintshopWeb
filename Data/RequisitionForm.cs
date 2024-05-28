@@ -12,6 +12,7 @@ namespace ETPrintshopWeb.Data
         public DateTime? DateRequested { get; set; } = DateTime.Now.Date;
         public DateTime? DeliveryDate { get; set; }
         public string? Status { get; set; } = "Pending";
+        public string? PreparedBy { get; set; }
         public string? ReceivedBy { get; set; }
         public string? ApprovedBy { get; set; }
         public ApplicationUser? User { get; set; }

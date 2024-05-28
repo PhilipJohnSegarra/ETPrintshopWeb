@@ -1,0 +1,200 @@
+﻿﻿@using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@rendermode InteractiveServer
+
+
+<div class="ParticipantsSection-Container" style="width:100%;height:auto;border:1px solid black;border-radius:10px; margin:1rem 0 1rem 0;padding:1rem;background-color:#fffffe;">
+
+    <div style="width:100%;display:flex;flex-direction:row;justify-content:space-between;align-items:center;">
+        <h2>RequisitionItem</h2>
+        <button class="btn btn-success" @onclick="AddNewUser" style="padding: 8px 2rem;border:none;border-radius:6px;background-color:#FFD803;display:flex;flex-direction:row;justify-content:center;align-items:center;margin-left:auto;cursor:pointer;">Add RequisitionItem</button>
+    </div>
+
+    @if (ShowPopup)
+    {
+        <!-- This is the popup to create or edit a user -->
+        <div class="modal" tabindex="-1" style="display:block; padding:1rem;border:1px solid black;margin:1rem 0 0 0;border-radius:10px;" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="margin:0 0 1rem 0;display:flex;flex-direction:row;justify-content:space-between;align-items:center;">
+                        <h3 class="modal-title">@action</h3>
+                        <!-- Button to close the popup -->
+                        <button type="button" class="close" style="background-color:#FFD803;padding:8px;border:none;border-radius:6px;cursor:pointer;"
+                                @onclick="ClosePopup">
+                            <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="black" d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z" /></svg></span>
+                        </button>
+                    </div>
+                    <!-- Edit form for the current user -->
+                    <div class="modal-body" style="width:100%;">
+                        <EditForm Model="RequisitionItem" method="post" OnValidSubmit="SaveParticipant" FormName="register" style="width:100%;">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="text-danger" role="alert" />
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;width: 100%;">
+                                <div class="inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                    <InputText @bind-Value="RequisitionItem.CTR" aria-required="true" placeholder="Entry number" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                                </div>
+                                <div class="inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                    <InputNumber @bind-Value="RequisitionItem.Quantity" aria-required="true" placeholder="Enter participant's name" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                                </div>
+                                <div class="inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                    <InputText @bind-Value="RequisitionItem.Particular" aria-required="true" placeholder="Enter participant's course" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                                </div>
+                            </div>
+
+                            <div style="display:flex;flex-direction:row;justify-content:end;align-items:center;margin:1rem 0 0 0;">
+                                @if (RequisitionItem.Id != 0)
+                                {
+                                    <!-- Button to delete the forecast -->
+                                    <button class="btn btn-danger" style="background-color:lightcoral;padding:8px;border:none;border-radius:6px;margin:0 auto 0 0;cursor:pointer;"
+                                            @onclick="DeleteParticipant">
+                                        Delete
+                                    </button>
+                                }
+                                <button type="submit" class="btn-create" style="background-color:#2342c0;padding:8px 2rem;border:none;border-radius:6px;color:white;cursor:pointer;">Save</button>
+                            </div>
+
+
+                            <!-- Only show delete button if not a new record -->
+
+                        </EditForm>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div style="width:100%;overflow:auto;">
+        <table class="table" style="width:100%;margin:0 0 1rem 0;border-spacing: 15px 20px; min-width:600px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:10px;">Entry#:</th>
+                    <th style="text-align:left;padding:10px;">RequisitionItem Name</th>
+                    <th style="text-align:left;padding:10px;">Course</th>
+                    <th style="text-align:left;padding:10px;">Section</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var participant in RowRFitems)
+                {
+                    <tr>
+                        <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">@participant.CTR</td>
+                        <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">@participant.Quantity</td>
+                        <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">@participant.Particular</td>
+                        <td>
+                            <!-- Edit the current forecast -->
+                            <button class="btn btn-primary" style="width:100%;height:40px;border:2px solid #2342C0;border-radius:6px;background-color:transparent;display:flex;flex-direction:row;justify-content:center;align-items:center;cursor:pointer;"
+                                    @onclick="(() => EditParticipant(participant))">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+</div>
+
+@code {
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [Parameter]
+    public RequisitionForm? RequisitionForm { get; set; }
+
+    List<RequisitionItem> RowRFitems = new List<RequisitionItem>();
+
+    string? action { get; set; }
+
+    // Property used to add or edit the currently selected user
+    [SupplyParameterFromForm]
+    public RequisitionItem? RequisitionItem { get; set; } = new();
+
+    // To enable showing the Popup
+    bool ShowPopup = false;
+
+    protected override void OnInitialized()
+    {
+        GetParticipants();
+
+    }
+
+    public void GetParticipants()
+    {
+        RowRFitems = new List<RequisitionItem>();
+
+        var participants = DB.RequisitionItems.Where(x => x.RequisitionForm == RequisitionForm);
+        foreach (var item in participants)
+        {
+            RowRFitems.Add(item);
+        }
+
+    }
+    public async Task SaveParticipant()
+    {
+
+        // Is this an existing user?
+        if (RequisitionItem.Id != 0)
+        {
+            DB.RequisitionItems.Update(RequisitionItem);
+            await DB.SaveChangesAsync();
+        }
+        else
+        {
+            RequisitionItem.RequisitionForm = RequisitionForm;
+            DB.RequisitionItems.Add(RequisitionItem);
+            await DB.SaveChangesAsync();
+
+        }
+
+        ShowPopup = false;
+        GetParticipants();
+
+    }
+
+    void EditParticipant(RequisitionItem participants)
+    {
+        // Set the selected user
+        // as the current user
+        RequisitionItem = participants;
+        // Open the Popup
+        ShowPopup = true;
+        action = "Edit RequisitionItem";
+    }
+    async Task DeleteParticipant()
+    {
+
+        // Close the Popup
+        ShowPopup = false;
+        DB.RequisitionItems.Remove(RequisitionItem);
+        await DB.SaveChangesAsync();
+
+        // Refresh Users
+        GetParticipants();
+    }
+    void ClosePopup()
+    {
+        // Close the Popup
+        ShowPopup = false;
+    }
+
+    void AddNewUser()
+    {
+        RequisitionItem = new RequisitionItem();
+        RequisitionItem.RequisitionForm = RequisitionForm;
+
+        RowRFitems.Add(RequisitionItem);
+        // Open the Popup
+        ShowPopup = true;
+        action = "Add New RequisitionItem";
+    }
+
+
+}
