@@ -25,6 +25,26 @@
             <dt class="col-sm-2">DateCreated</dt>
             <dd class="col-sm-10">@purchaseorder.DateCreated</dd>
         </dl>
+        <dl class="row">
+            <dt class="col-sm-2">SupplierName</dt>
+            <dd class="col-sm-10">@purchaseorder.SupplierName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">RequesterName</dt>
+            <dd class="col-sm-10">@purchaseorder.RequesterName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DeliverySchedule</dt>
+            <dd class="col-sm-10">@purchaseorder.DeliverySchedule</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">PaymentType</dt>
+            <dd class="col-sm-10">@purchaseorder.PaymentType</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Notes</dt>
+            <dd class="col-sm-10">@purchaseorder.Notes</dd>
+        </dl>
         <EditForm method="post" Model="purchaseorder" OnValidSubmit="DeletePurchaseOrder" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(purchaseorder is null)">Delete</button> |
             <a href="/purchaseorders">Back to List</a>

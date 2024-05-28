@@ -27,13 +27,13 @@
             {
                 <tr style="border:1px solid black;">
                     <td>
-                        @rf.DateRequested
+                        @rf.DateRequested.Value.ToShortDateString()
                     </td>
                     <td>
                         @rf.JONumber
                     </td>
                     <td>
-                        @rf.DeliveryDate
+                        @rf.DeliveryDate.Value.ToShortDateString()
                     </td>
                     <td>
                         @rf.Status

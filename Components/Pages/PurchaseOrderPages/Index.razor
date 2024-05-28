@@ -5,7 +5,7 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Purchase Orders</h1>
+<h1>Index</h1>
 
 <p>
     <a href="purchaseorders/create">Create New</a>
@@ -14,6 +14,11 @@
 <QuickGrid Class="table" Items="DB.PurchaseOrders">
     <PropertyColumn Property="purchaseorder => purchaseorder.Status" />
     <PropertyColumn Property="purchaseorder => purchaseorder.DateCreated" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.SupplierName" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.RequesterName" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.DeliverySchedule" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.PaymentType" />
+    <PropertyColumn Property="purchaseorder => purchaseorder.Notes" />
 
     <TemplateColumn Context="purchaseorder">
         <a href="@($"purchaseorders/edit?id={purchaseorder.Id}")">Edit</a> |

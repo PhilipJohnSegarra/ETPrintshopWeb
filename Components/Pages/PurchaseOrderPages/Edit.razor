@@ -32,6 +32,31 @@ else
                     <InputDate id="datecreated" @bind-Value="PurchaseOrder.DateCreated" class="form-control" />
                     <ValidationMessage For="() => PurchaseOrder.DateCreated" class="text-danger" />
                 </div>
+                <div class="mb-3">
+                    <label for="suppliername" class="form-label">SupplierName:</label>
+                    <InputText id="suppliername" @bind-Value="PurchaseOrder.SupplierName" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.SupplierName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="requestername" class="form-label">RequesterName:</label>
+                    <InputText id="requestername" @bind-Value="PurchaseOrder.RequesterName" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.RequesterName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="deliveryschedule" class="form-label">DeliverySchedule:</label>
+                    <InputDate id="deliveryschedule" @bind-Value="PurchaseOrder.DeliverySchedule" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.DeliverySchedule" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="paymenttype" class="form-label">PaymentType:</label>
+                    <InputText id="paymenttype" @bind-Value="PurchaseOrder.PaymentType" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.PaymentType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes:</label>
+                    <InputText id="notes" @bind-Value="PurchaseOrder.Notes" class="form-control" />
+                    <ValidationMessage For="() => PurchaseOrder.Notes" class="text-danger" />
+                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>

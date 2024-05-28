@@ -77,22 +77,10 @@
                             @if(requisitionform.Status == "Pending")
                             {
                                 <div class="d-flex flex-row justify-content-between">
-                                    <button @onclick="@(() => {
-                                        var item = DB.RequisitionForms.Single(i => i.Id == requisitionform.Id);
-                                        item.Status = "Declined";
-                                        DB.RequisitionForms.Update(item);
-                                        DB.SaveChanges();
-                                        NavigationManager.NavigateTo("/requisitionforms");
-                                    })" class="btn btn-danger me-3">
+                                    <button @onclick="Decline" class="btn btn-danger me-3">
                                         Decline
                                     </button>
-                                    <button @onclick="@(() => {
-                                        var item = DB.RequisitionForms.Single(i => i.Id == requisitionform.Id);
-                                        item.Status = "Approved";
-                                        DB.RequisitionForms.Update(item);
-                                        DB.SaveChanges();
-                                        NavigationManager.NavigateTo("/requisitionforms");
-                                    })" class="btn btn-success">Approve</button>
+                                    <button @onclick="Approve" class="btn btn-success">Approve</button>
                                 </div>
                             }
                             
@@ -122,5 +110,21 @@
         {
             NavigationManager.NavigateTo("notfound");
         }
+    }
+    void Decline()
+    {
+        var item = DB.RequisitionForms.Single(i => i.Id == requisitionform.Id);
+        item.Status = "Declined";
+        DB.RequisitionForms.Update(item);
+        DB.SaveChanges();
+        NavigationManager.NavigateTo("/requisitionforms");
+    }
+    void Approve()
+    {
+        var item = DB.RequisitionForms.Single(i => i.Id == requisitionform.Id);
+        item.Status = "Approved";
+        DB.RequisitionForms.Update(item);
+        DB.SaveChanges();
+        NavigationManager.NavigateTo("/requisitionforms");
     }
 }
