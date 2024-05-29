@@ -52,6 +52,21 @@ else
                     <InputNumber id="price" @bind-Value="Product.Price" class="form-control" />
                     <ValidationMessage For="() => Product.Price" class="text-danger" />
                 </div>
+                <div class="mb-3">
+                    <label for="supplier" class="form-label">Supplier:</label>
+                    <InputSelect id="supplier" class="form-control" @bind-Value="Product.SupplierId">
+                        <option value="">
+                            Select Supplier
+                        </option>
+                        @foreach (var supp in Suppliers)
+                        {
+                            <option value="@supp.Id">
+                                @supp.Name
+                            </option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Product.Supplier" class="text-danger" />
+                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -69,9 +84,12 @@ else
     [SupplyParameterFromForm]
     public Product? Product { get; set; }
 
+    List<Supplier> Suppliers { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         Product ??= await DB.Products.FirstOrDefaultAsync(m => m.Id == Id);
+        Suppliers = DB.Suppliers.ToList();
 
         if (Product is null)
         {
