@@ -8,17 +8,18 @@
 
 <h1>Edit</h1>
 
-<h4>Product</h4>
-<hr />
+<div>
+    <a class="btn btn-outline-dark" href="/products">Back</a>
+</div>
 @if (Product is null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Product" OnValidSubmit="UpdateProduct" FormName="edit" Enhance>
+    <div class="container-fluid">
+        <div class="container-fluid p-4">
+            <EditForm method="post" Model="Product" OnValidSubmit="UpdateProduct" FormName="edit" Enhance style="width:800px;background-color:white;padding:1rem;border-radius:10px;">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <input type="hidden" name="Product.Id" value="@Product.Id" />
@@ -73,9 +74,7 @@ else
     </div>
 }
 
-<div>
-    <a href="/products">Back to List</a>
-</div>
+
 
 @code {
     [SupplyParameterFromQuery]

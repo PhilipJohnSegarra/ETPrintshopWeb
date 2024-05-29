@@ -6,12 +6,15 @@
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
+<div>
+    <a class="btn btn-outline-dark" href="/products">Back</a>
+</div>
 
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Product" OnValidSubmit="AddProduct" FormName="create" Enhance>
+<div class="container-fluid">
+    <div class="container-fluid p-4" style="overflow:auto;">
+        <EditForm method="post" Model="Product" OnValidSubmit="AddProduct" FormName="create" Enhance style="width:800px;background-color:white;padding:1rem;border-radius:10px;">
+            <h4>New Product</h4>
+            <hr />
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
@@ -64,9 +67,7 @@
     </div>
 </div>
 
-<div>
-    <a href="/products">Back to List</a>
-</div>
+
 
 @code {
 

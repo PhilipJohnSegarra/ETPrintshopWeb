@@ -5,13 +5,15 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<div>
+    <a class="btn btn-outline-dark" href="/suppliers">Back</a>
+</div>
 
-<h4>Supplier</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Supplier" OnValidSubmit="AddSupplier" FormName="create" Enhance>
+<div class="container-fluid">
+    <div class="container-fluid p-4" style="overflow:auto;">
+        <EditForm method="post" Model="Supplier" OnValidSubmit="AddSupplier" FormName="create" Enhance style="width:800px;background-color:white;padding:1rem;border-radius:10px;">
+            <h4>New Supplier</h4>
+            <hr />
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
@@ -52,10 +54,6 @@
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
-</div>
-
-<div>
-    <a href="/suppliers">Back to List</a>
 </div>
 
 @code {

@@ -7,18 +7,18 @@
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>
-
-<h4>Supplier</h4>
-<hr />
+<div>
+    <a class="btn btn-outline-dark" href="/suppliers">Back</a>
+</div>
 @if (Supplier is null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Supplier" OnValidSubmit="UpdateSupplier" FormName="edit" Enhance>
+    <div class="container-fluid">
+        <div class="container-fluid p-4" style="overflow:auto;">
+            <EditForm method="post" Model="Supplier" OnValidSubmit="UpdateSupplier" FormName="edit" Enhance style="width:800px;background-color:white;padding:1rem;border-radius:10px;">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <input type="hidden" name="Supplier.Id" value="@Supplier.Id" />
@@ -63,9 +63,7 @@ else
     </div>
 }
 
-<div>
-    <a href="/suppliers">Back to List</a>
-</div>
+
 
 @code {
     [SupplyParameterFromQuery]
