@@ -7,6 +7,8 @@ namespace ETPrintshopWeb.Data
     {
         public string? Fullname { get; set; }
         public string? ImagePath { get; set; }
+        public string? ContactNumber { get; set; }
+        public string? Address { get; set; }
     }
 
 }

@@ -1,0 +1,87 @@
+﻿@page "/users"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+
+<PageTitle>Index</PageTitle>
+
+
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
+    <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
+        <h1>Users</h1>
+
+        <p>
+            <a class="btn btn-info text-light" href="/suppliers/create">Create New</a>
+        </p>
+    </div>
+
+
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
+        <thead style="background-color:#7C738F;">
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Fullname</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Email</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Contact Number</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Password</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Address</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Role</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var user = from peep in DB.Users
+                           join userrole in DB.UserRoles on peep.Id equals userrole.UserId
+                           join role in DB.Roles on userrole.RoleId equals role.Id
+                           select new
+                           {
+                               Id = peep.Id,
+                               Fullname = peep.Fullname,
+                               Email = peep.Email,
+                               ContactNumber = peep.ContactNumber,
+                               Password = peep.PasswordHash,
+                               Address = peep.Address,
+                               Role = role.Name
+                           };
+            }
+            @foreach (var i in user)
+            {
+                <tr style="border:1px solid black;">
+                    <td style="text-align:start;">
+                        @i.Fullname
+                    </td>
+                    <td style="text-align:start;">
+                        @i.Email
+                    </td>
+                    <td style="text-align:start;">
+                        @i.ContactNumber
+                    </td>
+                    <td style="text-align:start;">
+                        *******
+                    </td>
+                    <td style="text-align:start;">
+                        @i.Address
+                    </td>
+                    <td style="text-align:start;">
+                        @(i.Role != null? i.Role : i.Role)
+                    </td>
+                    <td style="text-align:start;">
+                        <a href="@($"users/edit?id={i.Id}")"><img src="edit-icon.png" /></a> |
+                        <a href="@($"users/details?id={i.Id}")">Details</a> |
+                        <a href="@($"users/delete?id={i.Id}")"><img src="remove-icon.png" /></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@code{
+    List<ApplicationUser> Users { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        Users = DB.Users.ToList();
+    }
+}
