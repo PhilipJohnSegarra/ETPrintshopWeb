@@ -110,14 +110,15 @@ else
                             string approveDisplay = "";
                             bool isDisabled = false;
                             <div class="d-flex flex-row justify-content-between">
-                                <button disabled="@isDisabled" style="@declineDisplay" @onclick="@(() => {RequisitionForm.Status = "Declined"; declineText = "Declined"; approveDisplay="display:none;"; isDisabled = true; })" class="btn btn-danger me-3">
+                                <button type="button" disabled="@isDisabled" style="@declineDisplay" @onclick="@(() => {RequisitionForm.Status = "Declined"; declineText = "Declined"; approveDisplay="display:none;"; isDisabled = true; })" class="btn btn-danger me-3">
                                     @declineText
                                 </button>
-                                <button disabled="@isDisabled" style="@approveDisplay" @onclick="@(() => {RequisitionForm.Status = "Approved"; approveText = "Approved"; declineDisplay="display:none;"; isDisabled= true;})" class="btn btn-success">
+                                <button type="button" disabled="@isDisabled" style="@approveDisplay" @onclick="@(() => {RequisitionForm.Status = "Approved"; approveText = "Approved"; declineDisplay="display:none;"; isDisabled= true;})" class="btn btn-success">
                                     @approveText
                                 </button>
                             </div>
                         }
+                        <button type="submit" class="btn btn-info">Save Changes</button>
                     </div>
                 </EditForm>
             </div>
@@ -138,7 +139,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         RequisitionForm ??= await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
-        Items = DB.RequisitionItems.Where(i => i.RequisitionForm == RequisitionForm).ToList();
+        foreach (var item in DB.RequisitionItems.Where(i => i.RequisitionForm == RequisitionForm).ToList())
+        {
+            Items.Add(item);
+        }
         if (RequisitionForm is null)
         {
             NavigationManager.NavigateTo("notfound");
@@ -155,12 +159,20 @@ else
         {
             foreach(var item in Items)
             {
-                var currentitem = await DB.RequisitionItems.SingleAsync(i => i.Id == item.Id);
-                DB.RequisitionItems.Update(currentitem);
+                var currentitem = await DB.RequisitionItems.SingleOrDefaultAsync(i => i.Id == item.Id);
+                if(currentitem != null)
+                {
+                    DB.RequisitionItems.Update(item);
+                }
+                else if(currentitem == null)
+                {
+                    item.RequisitionForm = RequisitionForm;
+                    DB.RequisitionItems.Add(item);
+                }
             }
             foreach(var item in RemovedItems)
             {
-                var currentitem = await DB.RequisitionItems.SingleAsync(i => i.Id == item.Id);
+                var currentitem = await DB.RequisitionItems.SingleOrDefaultAsync(i => i.Id == item.Id);
                 DB.RequisitionItems.Remove(currentitem);
             }
             await DB.SaveChangesAsync();

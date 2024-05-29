@@ -74,15 +74,7 @@
                         </div>
                         <div class="container-fluid d-flex flex-row justify-content-between">
                             <a class="btn btn-outline-dark text-decoration-none" href="@($"requisitionforms/edit?id={requisitionform.Id}")">Edit</a>
-                            @if(requisitionform.Status == "Pending")
-                            {
-                                <div class="d-flex flex-row justify-content-between">
-                                    <button @onclick="Decline" class="btn btn-danger me-3">
-                                        Decline
-                                    </button>
-                                    <button @onclick="Approve" class="btn btn-success">Approve</button>
-                                </div>
-                            }
+                            <div></div>
                             
                         </div>
 

@@ -5,40 +5,40 @@
 
 <PageTitle>Index</PageTitle>
 
-<div class="container-fluid" style="width:95%;height:100%;background-color:white;padding:2rem;">
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
     <h1>Requisitions</h1>
 
     <p>
         <a class="btn btn-info text-light" href="requisitionforms/create">Create New</a>
     </p>
 
-    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;">
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
         <thead style="background-color:#7C738F;">
-            <tr>
-                <th style="color:white;padding:8px 0 8px 8px;">Date Created</th>
-                <th style="color:white;padding:8px 0 8px 8px;">J.O. #</th>
-                <th style="color:white;padding:8px 0 8px 8px;">Delivery Date</th>
-                <th style="color:white;padding:8px 0 8px 8px;">Status</th>
-                <th style="color:white;padding:8px 0 8px 8px;">Action</th>
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Date Created</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">J.O. #</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Delivery Date</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Status</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
             </tr>
         </thead>
         <tbody>
             @foreach(var rf in RequisitionForms)
             {
                 <tr style="border:1px solid black;">
-                    <td>
-                        @rf.DateRequested.Value.ToShortDateString()
+                    <td style="text-align:center;">
+                        @(rf.DateRequested != null? rf.DateRequested.Value.ToShortDateString() : null)
                     </td>
-                    <td>
+                    <td style="text-align:center;">
                         @rf.JONumber
                     </td>
-                    <td>
-                        @rf.DeliveryDate.Value.ToShortDateString()
+                    <td style="text-align:center;">
+                        @(rf.DeliveryDate != null? rf.DeliveryDate.Value.ToShortDateString() : null)
                     </td>
-                    <td>
+                    <td style="text-align:center;">
                         @rf.Status
                     </td>
-                    <td>
+                    <td style="text-align:center;">
                         <a href="@($"requisitionforms/edit?id={rf.Id}")"><img src="edit-icon.png"/></a> |
                         <a href="@($"requisitionforms/details?id={rf.Id}")">Details</a> |
                         <a href="@($"requisitionforms/delete?id={rf.Id}")"><img src="remove-icon.png"/></a>
