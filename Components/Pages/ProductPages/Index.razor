@@ -5,23 +5,69 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Index</h1>
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
+    <h1>Inventory</h1>
 
-<p>
-    <a href="products/create">Create New</a>
-</p>
+    <p>
+        <a class="btn btn-info text-light" href="products/create">Create New</a>
+    </p>
 
-<QuickGrid Class="table" Items="DB.Products">
-    <PropertyColumn Property="product => product.Name" />
-    <PropertyColumn Property="product => product.Category" />
-    <PropertyColumn Property="product => product.BrandName" />
-    <PropertyColumn Property="product => product.Model" />
-    <PropertyColumn Property="product => product.Stocks" />
-    <PropertyColumn Property="product => product.Price" />
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
+        <thead style="background-color:#7C738F;">
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Product Name</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Brand</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Category</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Model</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Supplier</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Stock</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Price</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Products)
+            {
+                <tr style="border:1px solid black;">
+                    <td style="text-align:center;">
+                        @item.Name
+                    </td>
+                    <td style="text-align:center;">
+                        @item.BrandName
+                    </td>
+                    <td style="text-align:center;">
+                        @item.Category
+                    </td>
+                    <td style="text-align:center;">
+                        @item.Model
+                    </td>
+                    <td style="text-align:center;">
+                        @(item.Supplier != null ? Suppliers.SingleOrDefault(i => i.Id == item.SupplierId).Name : null)
+                    </td>
+                    <td style="text-align:center;">
+                        @item.Stocks
+                    </td>
+                    <td style="text-align:center;">
+                        @item.Price
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="@($"products/edit?id={item.Id}")"><img src="edit-icon.png" /></a> |
+                        <a href="@($"products/details?id={item.Id}")">Details</a> |
+                        <a href="@($"products/delete?id={item.Id}")"><img src="remove-icon.png" /></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-    <TemplateColumn Context="product">
-        <a href="@($"products/edit?id={product.Id}")">Edit</a> |
-        <a href="@($"products/details?id={product.Id}")">Details</a> |
-        <a href="@($"products/delete?id={product.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+</div>
+
+@code{
+    List<Product> Products { get; set; } = new();
+    List<Supplier> Suppliers { get; set; } = new();
+    protected override void OnInitialized()
+    {
+        Products = DB.Products.ToList();
+        Suppliers = DB.Suppliers.ToList();
+    }
+}

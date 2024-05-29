@@ -15,5 +15,6 @@ namespace ETPrintshopWeb.Data
         [Required]
         public double? Price { get; set; }
         public Supplier? Supplier { get; set; }
+        public int? SupplierId { get; set; }
     }
 }

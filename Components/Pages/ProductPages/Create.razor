@@ -43,7 +43,22 @@
                 <label for="price" class="form-label">Price:</label> 
                 <InputNumber id="price" @bind-Value="Product.Price" class="form-control" /> 
                 <ValidationMessage For="() => Product.Price" class="text-danger" /> 
-            </div>        
+            </div>
+            <div class="mb-3" style="min-width:490px;">
+                <label for="supplier" class="form-label">Supplier:</label>
+                <InputSelect id="supplier" class="form-control" @bind-Value="Product.SupplierId">
+                    <option value="">
+                        Select Supplier
+                    </option>
+                    @foreach (var supp in Suppliers)
+                    {
+                        <option value="@supp.Id">
+                            @supp.Name
+                        </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Product.Supplier" class="text-danger" />
+            </div>
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -57,6 +72,14 @@
 
     [SupplyParameterFromForm]
     public Product Product { get; set; } = new();
+
+    List<Supplier> Suppliers { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        Suppliers = DB.Suppliers.ToList();
+        base.OnInitialized();
+    }
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddProduct()

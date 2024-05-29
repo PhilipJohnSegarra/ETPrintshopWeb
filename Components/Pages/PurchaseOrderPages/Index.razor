@@ -5,24 +5,62 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Index</h1>
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
+    <h1>Purchase Orders</h1>
 
-<p>
-    <a href="purchaseorders/create">Create New</a>
-</p>
+    <p>
+        <a class="btn btn-info text-light" href="purchaseorders/create">Create New</a>
+    </p>
 
-<QuickGrid Class="table" Items="DB.PurchaseOrders">
-    <PropertyColumn Property="purchaseorder => purchaseorder.Status" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.DateCreated" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.SupplierName" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.RequesterName" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.DeliverySchedule" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.PaymentType" />
-    <PropertyColumn Property="purchaseorder => purchaseorder.Notes" />
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
+        <thead style="background-color:#7C738F;">
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">PO #</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Date Created</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Supplier</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Items</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Status</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var po in PurchaseOrders)
+            {
+                <tr style="border:1px solid black;">
+                    <td style="text-align:center;">
+                        PO&#8211;000@(po.Id)
+                    </td>
+                    <td style="text-align:center;">
+                        @(po.DateCreated != null ? po.DateCreated.Value.ToShortDateString() : null)
+                    </td>
+                    <td style="text-align:center;">
+                        @(Suppliers.SingleOrDefault(i => i.Id == po.SupplierId) != null ? Suppliers.SingleOrDefault(i => i.Id == po.SupplierId).Name : null)
+                    </td>
+                    <td style="text-align:center;">
+                        @(DB.PurchaseOrderItems.Where(i => i.PurchaseOrder == po).Count())
+                    </td>
+                    <td style="text-align:center;">
+                        @po.Status
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="@($"purchaseorders/edit?id={po.Id}")"><img src="edit-icon.png" /></a> |
+                        <a href="@($"purchaseorders/details?id={po.Id}")">Generate Invoice</a> |
+                        <a href="@($"purchaseorders/delete?id={po.Id}")"><img src="remove-icon.png" /></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-    <TemplateColumn Context="purchaseorder">
-        <a href="@($"purchaseorders/edit?id={purchaseorder.Id}")">Edit</a> |
-        <a href="@($"purchaseorders/details?id={purchaseorder.Id}")">Details</a> |
-        <a href="@($"purchaseorders/delete?id={purchaseorder.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+</div>
+
+@code{
+    List<PurchaseOrder> PurchaseOrders { get; set; } = new();
+    List<Supplier> Suppliers { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        PurchaseOrders = DB.PurchaseOrders.ToList();
+        Suppliers = DB.Suppliers.ToList();
+    }
+}

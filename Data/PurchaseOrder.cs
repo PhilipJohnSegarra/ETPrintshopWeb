@@ -12,6 +12,7 @@ namespace ETPrintshopWeb.Data
         public ApplicationUser? User { get; set; }
         public string? SupplierName { get; set; }
         public Supplier? Supplier { get; set; }
+        public int? SupplierId { get; set; }
         public string? RequesterName { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime? DeliverySchedule { get; set; }

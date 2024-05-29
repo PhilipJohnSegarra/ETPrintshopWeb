@@ -6,50 +6,145 @@
 
 <PageTitle>Details</PageTitle>
 
-<h1>Details</h1>
+<a href="/purchaseorders" class="btn btn-outline-dark text-black mb-3">Back</a>
 
 <div>
-    <h4>PurchaseOrder</h4>
-    <hr />
-    @if (purchaseorder is null)
+    @if (PurchaseOrder is null)
     {
         <p><em>Loading...</em></p>
     }
     else {
-        <dl class="row">
-            <dt class="col-sm-2">Status</dt>
-            <dd class="col-sm-10">@purchaseorder.Status</dd>
-            <dt class="col-sm-2">DateCreated</dt>
-            <dd class="col-sm-10">@purchaseorder.DateCreated</dd>
-            <dt class="col-sm-2">SupplierName</dt>
-            <dd class="col-sm-10">@purchaseorder.SupplierName</dd>
-            <dt class="col-sm-2">RequesterName</dt>
-            <dd class="col-sm-10">@purchaseorder.RequesterName</dd>
-            <dt class="col-sm-2">DeliverySchedule</dt>
-            <dd class="col-sm-10">@purchaseorder.DeliverySchedule</dd>
-            <dt class="col-sm-2">PaymentType</dt>
-            <dd class="col-sm-10">@purchaseorder.PaymentType</dd>
-            <dt class="col-sm-2">Notes</dt>
-            <dd class="col-sm-10">@purchaseorder.Notes</dd>
-        </dl>
-        <div>
-            <a href="@($"/purchaseorders/edit?id={purchaseorder.Id}")">Edit</a> |
-            <a href="@($"/purchaseorders")">Back to List</a>
+        <div class="container-fluid" style="overflow:auto;">
+            <div class="container-fluid p-3" style="max-width:1120px;background-color:white;overflow:auto;min-width:900px;">
+                <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
+                    <h4>Invoice</h4>
+                    <button class="btn btn-outline-success">Print</button>
+                </div>
+                <hr />
+                <div class="container-fluid d-flex flex-row justify-content-between align-items-center mb-4">
+                    <div class="container d-flex flex-column justify-content-center align-items-start">
+                        <p>E.T. PRINTSHOPPE</p>
+                        <p>myetprintshoppe@yahoo.com</p>
+                        <p>
+                            257 R. DELA SERNA BRGY, Lapu-Lapu City,
+                            <br />6015 Cebu
+                        </p>
+                        <p>TEl.NO. (032)340-5438/ 511-3997</p>
+                    </div>
+                    <div class="container d-flex flex-column justify-content-center align-items-center">
+                        <img src="etlogodark.png" alt="E.T. Logo here"/>
+                    </div>
+                </div>
+                <div class="container-fluid d-flex flex-row justify-content-between align-items-start">
+                    <!--Vendor-->
+                    <div class="container d-flex flex-column justify-content-center align-items-start" style="max-width:380px;">
+                        <p><strong>Vendor</strong></p>
+                        <p>@(Supplier != null? Supplier.Name : null)</p>
+                        <p>@(Supplier != null ? Supplier.Address : null)</p>
+                        <p>@(Supplier != null ? Supplier.ContactPerson : null)</p>
+                        <p>@(Supplier != null ? Supplier.ContactNumber : null)</p>
+                        <p>@(Supplier != null ? Supplier.Email : null)</p>
+                    </div>
+                    <div class="container d-flex flex-row flex-wrap">
+                        <div style="min-width:200px;">
+                            <p><strong>P.O. #</strong></p>
+                            <p><span>PO&#8211;000</span>@PurchaseOrder.Id</p>
+                        </div>
+                        <div style="min-width:200px;">
+                            <p><strong>Payment Type</strong></p>
+                            <p>@PurchaseOrder.PaymentType</p>
+                        </div>
+                        <div style="min-width:200px;">
+                            <p><strong>Date Created</strong></p>
+                            <p>@(PurchaseOrder.DateCreated != null ? PurchaseOrder.DateCreated.Value.ToShortDateString() : "N/A")</p>
+                        </div>
+                        <div style="min-width:200px;">
+                            <p><strong>Requester's Name</strong></p>
+                            <p>@PurchaseOrder.RequesterName</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid mb-3 p-0" style="overflow:auto;border:1px solid gray;">
+                    <table class="table table-bordered container-fluid mb-3" style="table-layout:auto;min-width:1080px;">
+                        <tr class="text-light" style="background-color:#7C738F;">
+                            <th style="padding:1rem 0 1rem 1rem;">Quantity</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Unit</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Item</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Description</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Price</th>
+                            <th style="padding:1rem 0 1rem 1rem;text-align:center;">Total</th>
+                        </tr>
+                        @foreach (var item in POitems)
+                        {
+                            var total = item.Price * item.Quantity;
+                            <tr class="table">
+                                <td>
+                                    @item.Quantity
+                                </td>
+                                <td>
+                                    @item.Unit
+                                </td>
+                                <td>
+                                    @item.Item
+                                </td>
+                                <td>
+                                    @item.Description
+                                </td>
+                                <td>
+                                    @item.Price
+                                </td>
+                                <td style="text-align:end;">@total</td>
+                            </tr>
+                        }
+                        <tr class="table">
+                            <td>
+                                    
+                            </td>
+                            <td>
+                                    
+                            </td>
+                            <td>
+                                    
+                            </td>
+                            <td>
+                                    
+                            </td>
+                            <td>
+                                <strong>Total:</strong>
+                            </td>
+                            <td style="text-align:end"><strong>@POitems.Sum(i => i.Quantity * i.Price)</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                    @* <div class="mb-3">
+                <label for="suppliername" class="form-label">SupplierName:</label>
+                <InputText id="suppliername" value="PurchaseOrder.SupplierName" class="form-control" />
+                <ValidationMessage For="() => PurchaseOrder.SupplierName" class="text-danger" />
+                </div>   *@
+            </div>
         </div>
     }
 </div>
 
 @code {
-    PurchaseOrder? purchaseorder;
+    PurchaseOrder? PurchaseOrder;
 
     [SupplyParameterFromQuery]
     public int? Id { get; set; }
 
+    List<PurchaseOrderItem> POitems { get; set; } = new();
+
+    Supplier? Supplier { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        purchaseorder = await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
+        PurchaseOrder = await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
+        Supplier = DB.Suppliers.SingleOrDefault(i => i.Id == PurchaseOrder.SupplierId);
+        POitems = DB.PurchaseOrderItems.Where(i => i.PurchaseOrder == PurchaseOrder).ToList();
 
-        if (purchaseorder is null)
+        if (PurchaseOrder is null)
         {
             NavigationManager.NavigateTo("notfound");
         }

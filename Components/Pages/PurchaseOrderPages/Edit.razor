@@ -3,6 +3,7 @@
 @using ETPrintshopWeb.Data
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
 
@@ -16,48 +17,144 @@
 }
 else
 {
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="PurchaseOrder" OnValidSubmit="UpdatePurchaseOrder" FormName="edit" Enhance>
+    <div class="container-fluid">
+        <div class="container-fluid p-3" style="max-width:1120px;background-color:white;overflow:auto;">
+            <h4>Purchase Order</h4>
+            <hr />
+            <EditForm method="post" Model="PurchaseOrder" OnValidSubmit="UpdatePurchaseOrder" FormName="create" Enhance style="width:100%;">
+                @if (PurchaseOrder.Status == "Pending")
+                {
+                    string declineText = "Decline";
+                    string approveText = "Approve";
+                    string declineDisplay = "";
+                    string approveDisplay = "";
+                    bool isDisabled = false;
+                    <div class="container-fluid d-flex flex-row justify-content-end border-1 p-1 border-danger mb-4" style="border:1px solid red;">
+                        <h3 class="text-danger me-auto">Needs Action!</h3>
+                        <div class="d-flex flex-row justify-content-between">
+                            <button type="button" disabled="@isDisabled" style="@declineDisplay" @onclick="@(() => {PurchaseOrder.Status = "Declined"; declineText = "Declined"; approveDisplay="display:none;"; isDisabled = true; })" class="btn btn-danger me-3">
+                                @declineText
+                            </button>
+                            <button type="button" disabled="@isDisabled" style="@approveDisplay" @onclick="@(() => {PurchaseOrder.Status = "Approved"; approveText = "Approved"; declineDisplay="display:none;"; isDisabled= true;})" class="btn btn-success">
+                                @approveText
+                            </button>
+                        </div>
+                    </div>
+                        
+                }
                 <DataAnnotationsValidator />
-                <ValidationSummary />
-                <input type="hidden" name="PurchaseOrder.Id" value="@PurchaseOrder.Id" />
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status:</label>
-                    <InputText id="status" @bind-Value="PurchaseOrder.Status" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.Status" class="text-danger" />
+                <ValidationSummary class="text-danger" />
+                <div style="display:flex;flex-direction:row;flex-wrap:wrap;">
+                    <div class="mb-3 me-3" style="min-width:490px;">
+                        <label for="supplier" class="form-label">Supplier:</label>
+                        <InputSelect id="supplier" class="form-control" @bind-Value="PurchaseOrder.SupplierId">
+                            <option value="">
+                                Select Supplier
+                            </option>
+                            @foreach (var supp in Suppliers)
+                            {
+                                <option value="@supp.Id">
+                                    @supp.Name
+                                </option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => PurchaseOrder.SupplierName" class="text-danger" />
+                    </div>
+
+                    <div class="mb-3 me-3" style="min-width:490px;">
+                        <label for="requestername" class="form-label">RequesterName:</label>
+                        <InputText id="requestername" @bind-Value="PurchaseOrder.RequesterName" class="form-control" />
+                        <ValidationMessage For="() => PurchaseOrder.RequesterName" class="text-danger" />
+                    </div>
+                    <div class="mb-3 me-3" style="min-width:490px;">
+                        <label for="paymenttype" class="form-label">PaymentType:</label>
+                        <InputText id="paymenttype" @bind-Value="PurchaseOrder.PaymentType" class="form-control" />
+                        <ValidationMessage For="() => PurchaseOrder.PaymentType" class="text-danger" />
+                    </div>
+                    <div class="mb-3 me-3" style="min-width:490px;">
+                        <label for="deliveryschedule" class="form-label">DeliverySchedule:</label>
+                        <InputDate id="deliveryschedule" @bind-Value="PurchaseOrder.DeliverySchedule" class="form-control" />
+                        <ValidationMessage For="() => PurchaseOrder.DeliverySchedule" class="text-danger" />
+                    </div>
                 </div>
-                <div class="mb-3">
+                <!--Adding of Items here-->
+                <div class="container-fluid mb-3 p-0" style="overflow:auto;border:1px solid gray;background-color:#D9D9D9;">
+                    <table class="table table-bordered container-fluid mb-3" style="table-layout:auto;min-width:1080px;border-spacing:10px 10px;border-collapse:collapse;">
+                        <tr class="table-dark" style="background-color:#7C738F;">
+                            <th style="padding:1rem 0 1rem 1rem;">Delete</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Quantity</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Unit</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Item</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Description</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Price</th>
+                            <th style="padding:1rem 0 1rem 1rem;">Total</th>
+                        </tr>
+                        @foreach (var item in POitems)
+                        {
+                            var total = item.Price * item.Quantity;
+                            <tr class="table mb-1" style="background-color:white;">
+                                <td>
+                                    <button class="btn" type="button" @onclick="() => {
+                                    POitems.Remove(item);
+                                    RemovedItems.Add(item);
+                                }">
+                                        <img src="remove-icon.png" />
+                                    </button>
+                                </td>
+                                <td>
+                                    <input min="0" type="number" @bind="item.Quantity" style="width:100%;" placeholder="Enter here" />
+                                </td>
+                                <td>
+                                    <input type="text" @bind="item.Unit" style="width:100%;" placeholder="Enter here" />
+                                </td>
+                                <td>
+                                    <input type="text" @bind="item.Item" style="width:100%;" placeholder="Enter here" />
+                                </td>
+                                <td>
+                                    <input type="text" @bind="item.Description" style="width:100%;" placeholder="Enter here" />
+                                </td>
+                                <td>
+                                    <input type="number" step="any" @bind="item.Price" style="width:100%;" placeholder="Enter here" />
+                                </td>
+                                <td><input readonly="true" value="@total" type="number" style="width:100%;" placeholder="Enter here" /></td>
+                            </tr>
+                        }
+                    </table>
+                    <div class="container-fluid d-flex flex-row justify-content-between align-items-center mb-2" style="border:1px solid gray;padding:5px 5px;border-width:1px 0 1px 0;background-color:white;">
+                        <button class="btn d-flex flex-row justify-content-center align-items-center me-5" style="margin:0 0 0 auto;border-color:#6A6728;color:#6A6728;" type="button" @onclick="()=>{
+                                           var item = new PurchaseOrderItem();
+                                           POitems.Add(item);StateHasChanged();
+                                      }">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6A6728" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                            </svg>
+                            Add Item
+                        </button>
+                        <div>Subtotal: @POitems.Sum(i => i.Quantity * i.Price)</div>
+                    </div>
+                </div>
+
+                @* <div class="mb-3">
+            <label for="suppliername" class="form-label">SupplierName:</label>
+            <InputText id="suppliername" @bind-Value="PurchaseOrder.SupplierName" class="form-control" />
+            <ValidationMessage For="() => PurchaseOrder.SupplierName" class="text-danger" />
+            </div>   *@
+                <div class="mb-3" style="display:none;">
                     <label for="datecreated" class="form-label">DateCreated:</label>
                     <InputDate id="datecreated" @bind-Value="PurchaseOrder.DateCreated" class="form-control" />
                     <ValidationMessage For="() => PurchaseOrder.DateCreated" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="suppliername" class="form-label">SupplierName:</label>
-                    <InputText id="suppliername" @bind-Value="PurchaseOrder.SupplierName" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.SupplierName" class="text-danger" />
+                <div class="container-fluid mb-3 p-0" style="display:flex;flex-direction:row;justify-content:start;align-items:center;">
+                    <div class="mb-3 p-0 me-auto" style="width:100%;max-width:600px;">
+                        <label for="notes" class="form-label">Notes:</label>
+                        <InputTextArea id="notes" @bind-Value="PurchaseOrder.Notes" class="form-control" style="width:100%;" />
+                        <ValidationMessage For="() => PurchaseOrder.Notes" class="text-danger" />
+                    </div>
+                    <a class="btn btn-outline-secondary ms-auto me-3" href="/purchaseorders">Cancel</a>
+                    
+                    <button type="submit" class="btn btn-success">Save Changes</button>
                 </div>
-                <div class="mb-3">
-                    <label for="requestername" class="form-label">RequesterName:</label>
-                    <InputText id="requestername" @bind-Value="PurchaseOrder.RequesterName" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.RequesterName" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="deliveryschedule" class="form-label">DeliverySchedule:</label>
-                    <InputDate id="deliveryschedule" @bind-Value="PurchaseOrder.DeliverySchedule" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.DeliverySchedule" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="paymenttype" class="form-label">PaymentType:</label>
-                    <InputText id="paymenttype" @bind-Value="PurchaseOrder.PaymentType" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.PaymentType" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="notes" class="form-label">Notes:</label>
-                    <InputText id="notes" @bind-Value="PurchaseOrder.Notes" class="form-control" />
-                    <ValidationMessage For="() => PurchaseOrder.Notes" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+
             </EditForm>
         </div>
     </div>
@@ -74,10 +171,18 @@ else
     [SupplyParameterFromForm]
     public PurchaseOrder? PurchaseOrder { get; set; }
 
+    List<PurchaseOrderItem> POitems { get; set; } = new();
+    List<PurchaseOrderItem> RemovedItems { get; set; } = new();
+    List<Supplier> Suppliers { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         PurchaseOrder ??= await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
-
+        Suppliers = DB.Suppliers.ToList();
+        foreach (var item in DB.PurchaseOrderItems.Where(i => i.PurchaseOrder == PurchaseOrder).ToList())
+        {
+            POitems.Add(item);
+        }
         if (PurchaseOrder is null)
         {
             NavigationManager.NavigateTo("notfound");
@@ -92,6 +197,27 @@ else
 
         try
         {
+            foreach(var item in POitems)
+            {
+
+                var curItem = await DB.PurchaseOrderItems.SingleOrDefaultAsync(i => i.Id == item.Id);
+                if(curItem != null)
+                {
+                    
+                    DB.PurchaseOrderItems.Update(item);
+                }
+                else if(curItem == null)
+                {
+                    item.PurchaseOrder = PurchaseOrder;
+                    DB.PurchaseOrderItems.Add(item);
+                }
+
+            }
+            foreach(var item in RemovedItems)
+            {
+                var curItem = DB.PurchaseOrderItems.SingleOrDefault(i => i.Id == item.Id);
+                DB.PurchaseOrderItems.Remove(curItem);
+            }
             await DB.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
@@ -106,7 +232,7 @@ else
             }
         }
 
-        NavigationManager.NavigateTo("/purchaseorders");
+        NavigationManager.NavigateTo($"purchaseorders/details?id={PurchaseOrder!.Id}");
     }
 
     bool PurchaseOrderExists(int? id)
