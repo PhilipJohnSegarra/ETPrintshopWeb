@@ -74,11 +74,12 @@
                                 <input disabled="true" id="approvedby" value="@requisitionform.ApprovedBy" class="form-control" />
                             </div>
                         </div>
-                        <div class="container-fluid d-flex flex-row justify-content-between">
-                            <a class="btn btn-outline-dark text-decoration-none" href="@($"requisitionforms/edit?id={requisitionform.Id}")">Edit</a>
-                            <div></div>
-                            
-                        </div>
+                        <AuthorizeView Roles="Admin">
+                            <div class="container-fluid d-flex flex-row justify-content-between">
+                                <a class="btn btn-outline-dark text-decoration-none" href="@($"requisitionforms/edit?id={requisitionform.Id}")">Edit</a>
+                                <div></div>
+                            </div>
+                        </AuthorizeView>
 
                     </div>
                 </div>

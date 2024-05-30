@@ -12,7 +12,10 @@
     <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
         <h1>Requisitions</h1>
         <p>
-            <a class="btn btn-info text-light" href="requisitionforms/create">Create New</a>
+            <AuthorizeView Roles="Staff">
+                <a class="btn btn-info text-light" href="requisitionforms/create">Create New</a>
+            </AuthorizeView>
+
         </p>
     </div>
     
@@ -44,7 +47,10 @@
                         @rf.Status
                     </td>
                     <td style="text-align:center;">
-                        <a href="@($"requisitionforms/edit?id={rf.Id}")"><img src="edit-icon.png"/></a> |
+                        <AuthorizeView Roles="Admin">
+                            <a href="@($"requisitionforms/edit?id={rf.Id}")"><img src="edit-icon.png" /></a>
+                        </AuthorizeView>
+                        
                         <a href="@($"requisitionforms/details?id={rf.Id}")">Details</a> |
                         <a href="@($"requisitionforms/delete?id={rf.Id}")"><img src="remove-icon.png"/></a>
                     </td>

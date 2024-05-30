@@ -14,7 +14,9 @@
         <h1>Suppliers</h1>
 
         <p>
-            <a class="btn btn-info text-light" href="/suppliers/create">Create New</a>
+            <AuthorizeView Roles="Admin">
+                <a class="btn btn-info text-light" href="/suppliers/create">Create New</a>
+            </AuthorizeView>
         </p>
     </div>
 
@@ -29,7 +31,9 @@
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Address</th>
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Status</th>
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Date Added</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+                <AuthorizeView Roles="Admin">
+                    <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+                </AuthorizeView>
             </tr>
         </thead>
         <tbody>
@@ -57,11 +61,13 @@
                     <td style="text-align:center;">
                         @supplier.DateAdded
                     </td>
-                    <td style="text-align:center;">
-                        <a href="@($"suppliers/edit?id={supplier.Id}")"><img src="edit-icon.png" /></a> |
-                        <a href="@($"suppliers/details?id={supplier.Id}")">Details</a> |
-                        <a href="@($"suppliers/delete?id={supplier.Id}")"><img src="remove-icon.png" /></a>
-                    </td>
+                    <AuthorizeView Roles="Admin">
+                        <td style="text-align:center;">
+                            <a href="@($"suppliers/edit?id={supplier.Id}")"><img src="edit-icon.png" /></a> |
+                            <a href="@($"suppliers/details?id={supplier.Id}")">Details</a> |
+                            <a href="@($"suppliers/delete?id={supplier.Id}")"><img src="remove-icon.png" /></a>
+                        </td>
+                    </AuthorizeView>
                 </tr>
             }
         </tbody>

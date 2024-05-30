@@ -12,7 +12,9 @@
         <h1>Inventory</h1>
 
         <p>
-            <a class="btn btn-info text-light" href="products/create">Create New</a>
+            <AuthorizeView Roles="Admin">
+                <a class="btn btn-info text-light" href="products/create">Create New</a>
+            </AuthorizeView>
         </p>
     </div>
 
@@ -27,7 +29,9 @@
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Supplier</th>
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Stock</th>
                 <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Price</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+                <AuthorizeView Roles="Admin">
+                    <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th>
+                </AuthorizeView>
             </tr>
         </thead>
         <tbody>
@@ -53,13 +57,15 @@
                         @item.Stocks
                     </td>
                     <td style="text-align:center;">
-                        @item.Price
+                        &#8369;@item.Price
                     </td>
-                    <td style="text-align:center;">
-                        <a href="@($"products/edit?id={item.Id}")"><img src="edit-icon.png" /></a> |
-                        <a href="@($"products/details?id={item.Id}")">Details</a> |
-                        <a href="@($"products/delete?id={item.Id}")"><img src="remove-icon.png" /></a>
-                    </td>
+                    <AuthorizeView Roles="Admin">
+                        <td style="text-align:center;">
+                            <a href="@($"products/edit?id={item.Id}")"><img src="edit-icon.png" /></a> |
+                            <a href="@($"products/details?id={item.Id}")">Details</a> |
+                            <a href="@($"products/delete?id={item.Id}")"><img src="remove-icon.png" /></a>
+                        </td>
+                    </AuthorizeView>
                 </tr>
             }
         </tbody>
