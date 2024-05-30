@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <PageTitle>Index</PageTitle>
 
@@ -55,7 +58,8 @@
 @code{
     public List<RequisitionForm> RequisitionForms {get;set;} = new();
 
-    protected override void OnInitialized(){
-        RequisitionForms = DB.RequisitionForms.ToList();
+    protected override async Task OnInitializedAsync(){
+
+        RequisitionForms = await DB.RequisitionForms.ToListAsync();
     }
 }

@@ -1,8 +1,258 @@
-﻿@page "/users/edit"
+﻿@page "/users/edit/id={Id}"
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @using ETPrintshopWeb.Data
+@using ETPrintshopWeb.Components.Account
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@inject ILogger<Index> Logger
+@inject IWebHostEnvironment Environment
+@rendermode InteractiveServer
+
+@inject NavigationManager NavManager
+@inject IdentityUserAccessor UserAccessor
 
 <PageTitle>Edit</PageTitle>
+
+@if(user == null)
+{
+    <p>Please wait</p>
+}
+else
+{
+    <div class="container-fluid d-flex flex-row justify-content-end mb-3">
+        <button @onclick="OnCancel" class="btn btn-outline-danger" style="@cancelBtnDisplay">
+            Cancel
+        </button>
+        <button @onclick="OnEdit" class="btn btn-primary" style="@editBtnDisplay">
+            Edit
+        </button>
+    </div>
+    if (isEditMode)
+    {
+        <div class="" style="width:100%;">
+            <EditForm Model="user" method="post" OnValidSubmit="UpdateUser" FormName="register" style="width:100%;max-width:800px;background-color:white;padding:1rem;border-radius:10px;margin:0 auto 0 auto;">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+                @* @if (user.Id != "")
+        {
+        <p>@user.UserName</p>
+
+        }
+        else
+        {
+        <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+        <InputText @bind-Value="user.UserName" class="Register-inputUsername" autocomplete="username" aria-required="true" placeholder="Enter Username" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+        </div>
+        } *@
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+
+                    <InputFile OnChange="LoadFiles" multiple />
+                    <img style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:1px solid black;" class="img-fluid mt-3 mb-3" src="@user.ImagePath" />
+                </div>
+                <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label>Fullname</label>
+                    <InputText @bind-Value="user.Fullname" class="Register-inputEmail" aria-required="true" placeholder="Enter Fullname" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+                </div>
+                <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label>Contact Number</label>
+                    <InputText type="text" @bind-Value="user.ContactNumber" class="form-control" aria-required="true" placeholder="Enter Contact Number" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+                </div>
+                <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label>Address</label>
+                    <InputTextArea type="text" @bind-Value="user.Address" class="form-control" aria-required="true" placeholder="Enter Address" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+                </div>
+                <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label>Email</label>
+                    <InputText @bind-Value="user.Email" class="Register-inputEmail" autocomplete="email" aria-required="true" placeholder="Enter email" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+                </div>
+                <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label>Password</label>
+                    <InputText type="password" @bind-Value="user.PasswordHash" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Enter password" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;overflow:hidden;text-overflow:ellipsis;" />
+                </div>
+                
+                <div style="display:flex;flex-direction:row;justify-content:end;align-items:center;margin:1rem 0 0 0;">
+                    <button type="submit" class="btn-register" style="background-color:#2342c0;padding:8px 2rem;border:none;border-radius:6px;color:white;cursor:pointer;">Save</button>
+                </div>
+
+
+            </EditForm>
+
+
+        </div>
+    }
+    if(!isEditMode)
+    {
+        <div class="" style="width:100%;">
+            <div style="width:100%;max-width:800px;background-color:white;margin:0 auto 0 auto;border-radius:10px;padding:1rem;">
+                @* @if (user.Id != "")
+        {
+        <p>@user.UserName</p>
+
+        }
+        else
+        {
+        <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+        <InputText @bind-Value="user.UserName" class="Register-inputUsername" autocomplete="username" aria-required="true" placeholder="Enter Username" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;" />
+        </div>
+        } *@
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <img style="width:120px;height:120px;object-fit:cover;border-radius:50%;" class="img-fluid" src="@user.ImagePath" />
+                </div>
+
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label><strong>Fullname:</strong></label>
+                    <div style="display:flex;flex-direction:row;justify-content:center;align-items:center;width:100%;height:45px;border:1px solid black;border-width:0 0 1px 0;">
+                        <p style="display:block;">@user.Fullname</p>
+                    </div>
+                </div>
+
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label><strong>Contact Number:</strong></label>
+                    <div style="display:flex;flex-direction:row;justify-content:center;align-items:center;width:100%;height:45px;border:1px solid black;border-width:0 0 1px 0;">
+                        <p>@user.ContactNumber</p>
+                    </div>
+                </div>
+
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label><strong>Address:</strong></label>
+                    <div style="display:flex;flex-direction:row;justify-content:center;align-items:center;width:100%;height:45px;border:1px solid black;border-width:0 0 1px 0;">
+                        <p>@user.Address</p>
+                    </div>
+                </div>
+
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label><strong>Email:</strong></label>
+                    <div style="display:flex;flex-direction:row;justify-content:center;align-items:center;width:100%;height:45px;border:1px solid black;border-width:0 0 1px 0;">
+                        <p>@user.Email</p>
+                    </div>
+                </div>
+
+                <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:start;">
+                    <label><strong>Passwordhash:</strong></label>
+                    <div style="display:flex;flex-direction:row;justify-content:center;align-items:center;width:100%;height:45px;border:1px solid black;border-width:0 0 1px 0;">
+                        <p style="width:50%;overflow:hidden;text-overflow:ellipsis">@(user.PasswordHash.Substring(0, user.PasswordHash.Length - user.PasswordHash.Length / 3))...</p>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+    }
+
+    
+}
+
+
+@code{
+    [Parameter]
+    public string? Id { get; set; }
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [Parameter]
+    public ApplicationUser? user { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    bool isEditMode { get; set; } = false;
+
+    string cancelBtnDisplay = "display:none;";
+    string editBtnDisplay = "display:block;";
+    string editModeStyle = "display:none;";
+    string viewModeStyle = "dislay:block";
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await DB.Users.SingleAsync(i => i.Id == Id);
+    }
+    void OnEdit()
+    {
+        isEditMode = true;
+        cancelBtnDisplay = "display:block;";
+        editBtnDisplay = "display:none;";
+        editModeStyle = "display:block;";
+        viewModeStyle = "dislay:none";
+    }
+    void OnCancel()
+    {
+        isEditMode = false;
+        cancelBtnDisplay = "display:none;";
+        editBtnDisplay = "display:block;";
+        editModeStyle = "display:none;";
+        viewModeStyle = "dislay:block";
+    }
+
+    public async Task UpdateUser()
+    {
+        DB.Users.Update(user);
+
+        try
+        {
+            await DB.SaveChangesAsync();
+            OnCancel();
+            StateHasChanged();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (user == null)
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
+    //File Upload
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 1024 * 5;
+    private int maxAllowedFiles = 1;
+    private bool isLoading;
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var fileExtension = Path.GetExtension(file.Name);
+                var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif" };
+                if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                {
+                    throw new InvalidOperationException("Unsupported file type.");
+                }
+
+                var trustedFileName = Path.GetRandomFileName() + fileExtension;
+                var path = Path.Combine(Environment.WebRootPath, "uploads", trustedFileName);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                loadedFiles.Add(file);
+
+                var relativePath = Path.Combine("uploads", trustedFileName);
+                user.ImagePath = relativePath; // Store the relative path for use in the UI
+
+                Logger.LogInformation(
+                    "Unsafe Filename: {UnsafeFilename} File saved: {Filename}",
+                    file.Name, trustedFileName);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("File: {Filename} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+}
 
