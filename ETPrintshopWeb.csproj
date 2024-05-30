@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Development\unsafe_uploads\eor52ack.sde" />
+    <Content Include="Development\unsafe_uploads\fbtbko0w.psv.png" />
+    <Content Include="Development\unsafe_uploads\mt4i1ndq.d4k.png" />
+    <Content Include="Development\unsafe_uploads\n150k2jv.sf0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
@@ -18,7 +25,8 @@
 
   <ItemGroup>
     <Folder Include="Components\Layout\LandingLayoutComponents\" />
-    <Folder Include="DataServices\" />
+    <Folder Include="Components\Pages\AccountPage\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

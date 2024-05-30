@@ -1,9 +1,116 @@
 ﻿@page "/users/create"
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @using ETPrintshopWeb.Data
+﻿@using ETPrintshopWeb.Components.Account.Shared
+@using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Create</PageTitle>
 
+<h1>Create</h1>
+<div>
+    <a class="btn btn-outline-dark" href="/users">Back</a>
+</div>
 
+<div class="container-fluid">
+    <div class="container-fluid p-4" style="overflow:auto;">
+        <EditForm method="post" Model="User" OnValidSubmit="AddUser" FormName="create" Enhance style="width:800px;background-color:white;padding:1rem;border-radius:10px;">
+            <h4>New User</h4>
+            <hr />
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="Fullname" class="form-label">Fullname:</label>
+                <InputText id="Fullname" @bind-Value="User.Fullname" class="form-control" />
+                <ValidationMessage For="() => User.Fullname" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <InputText id="email" @bind-Value="User.Email" class="form-control" />
+                <ValidationMessage For="() => User.Email" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="contactnumber" class="form-label">Contact Number:</label>
+                <InputText id="contactnumber" @bind-Value="User.ContactNumber" class="form-control" />
+                <ValidationMessage For="() => User.ContactNumber" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <InputText id="password" @bind-Value="User.PasswordHash" class="form-control" />
+                <ValidationMessage For="() => User.PasswordHash" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label>
+                <InputTextArea id="address" @bind-Value="User.Address" class="form-control" />
+                <ValidationMessage For="() => User.Address" class="text-danger" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="supplier" class="form-label">Supplier:</label>
+                <InputSelect id="supplier" class="form-control" @bind-Value="userrole.RoleName">
+                    <option value="">
+                        Select Role
+                    </option>
+                    @foreach (var role in DB.Roles)
+                    {
+                        <option value="@role.Name">
+                            @role.Name
+                        </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => userrole.RoleName" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
 
+@code{
+    [SupplyParameterFromForm]
+    public ApplicationUser User { get; set; } = new();
+
+    UserRole userrole { get; set; } = new();
+
+    public async Task AddUser()
+    {
+        try
+        {
+            var user = (IdentityUser)User;
+            var result = await UserManager.CreateAsync(User, User.PasswordHash);
+            if (result.Succeeded)
+            {
+                await UserManager.AddToRoleAsync(User, userrole.RoleName);
+            }
+          
+            NavigationManager.NavigateTo("/users");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+        
+    }
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    public class UserRole{
+        public int? Id { get; set; }
+        public string? RoleName { get; set; }
+        public string? UserId { get; set; }
+    }
+}

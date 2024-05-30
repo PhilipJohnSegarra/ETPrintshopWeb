@@ -1,87 +1,501 @@
 ﻿@page "/users"
-@using Microsoft.AspNetCore.Components.QuickGrid
-@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+﻿@using ETPrintshopWeb.Components.Account.Shared
 @using ETPrintshopWeb.Data
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.WebUtilities
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@inject ILogger<Index> Logger
+@inject IWebHostEnvironment Environment
+@rendermode InteractiveServer
 
-<PageTitle>Index</PageTitle>
+@inject ETPrintshopWeb.Data.ApplicationDbContext db
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject UserService UserService
+
+<div class="JudgesSection-Container" style="width:100%;height:auto;border:1px solid black;border-radius:10px; margin:1rem 0 1rem 0;padding:1rem;background-color:#fffffe;@style">
+    <div style="width:100%;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:0 1rem;">
+        <h3>Users</h3>
+        <button class="btn btn-success" @onclick="AddNewUser" style="padding: 8px 2rem;border:none;border-radius:6px;background-color:#FFD803;display:flex;flex-direction:row;justify-content:center;align-items:center;margin-left:auto;cursor:pointer;">Add User</button>
+    </div>
+
+    @if (ShowPopup)
+    {
+        <!-- This is the popup to create or edit a user -->
+        <div class="modal" tabindex="-1" style="display:block; padding:1rem;border:1px solid black;margin:1rem 0 0 0;border-radius:10px;width:100%;" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="margin:0 0 1rem 0;display:flex;flex-direction:row;justify-content:space-between;align-items:center;">
+                        <h3 class="modal-title" style="font-size: 30px;">@action</h3>
+                        <!-- Button to close the popup -->
+                        <button type="button" class="close" style="background-color:#FFD803;padding:8px;border:none;border-radius:6px;cursor:pointer;"
+                                @onclick="ClosePopup">
+                            <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="black" d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z" /></svg></span>
+                        </button>
+                    </div>
+                    <!-- Edit form for the current user -->
+                    <div class="modal-body" style="width:100%;">
+                        <span style="color:red">@Message</span>
+                        <EditForm Model="objUser" method="post" OnValidSubmit="SaveUser" FormName="register" style="width:100%;">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="text-danger" role="alert" />
+                            @* @if (objUser.Id != "")
+                        {
+                        <p>@objUser.UserName</p>
+
+                        }
+                        else
+                        {
+                        <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                        <InputText @bind-Value="objUser.UserName" class="Register-inputUsername" autocomplete="username" aria-required="true" placeholder="Enter Username" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                        </div>
+                        } *@
+                            <div class="Register-inputbox mb-3" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputFile OnChange="LoadFiles" multiple />
+                                <img style="width:120px;height:120px;object-fit:cover;border-radius:50%;" class="img-fluid" src="@objUser.ImagePath" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputText @bind-Value="objUser.Fullname" class="Register-inputEmail" aria-required="true" placeholder="Enter Fullname" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputText @bind-Value="objUser.Email" class="Register-inputEmail" autocomplete="email" aria-required="true" placeholder="Enter email" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputText type="password" @bind-Value="objUser.PasswordHash" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Enter password" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputText type="text" @bind-Value="objUser.ContactNumber" class="form-control" aria-required="true" placeholder="Enter Contact Number" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputTextArea type="text" @bind-Value="objUser.Address" class="form-control" aria-required="true" placeholder="Enter Address" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;" />
+                            </div>
+                            <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                <InputSelect @bind-Value="@CurrentUserRole" class="form-control" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;">
+                                    <option style="padding: 1rem 0 1rem 0;" value="Select Role">
+                                        Select Role
+                                    </option>
+                                    @foreach (var option in Options)
+                                    {
+                                        <option style="padding: 1rem 0 1rem 0;" value="@option">
+                                            @option
+                                        </option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div style="display:flex;flex-direction:row;justify-content:end;align-items:center;margin:1rem 0 0 0;">
+                                <!-- Only show delete button if not a new record -->
+                                @if (objUser.Id != "")
+                                {
+                                    <!-- Button to delete the forecast -->
+                                    <button class="btn btn-danger" style="background-color:lightcoral;padding:8px;border:none;border-radius:6px;margin:0 auto 0 0;cursor:pointer;"
+                                            @onclick="DeleteUser">
+                                        Delete
+                                    </button>
+                                }
+                                <button type="submit" class="btn-register" style="background-color:#2342c0;padding:8px 2rem;border:none;border-radius:6px;color:white;cursor:pointer;">Save</button>
+                            </div>
 
 
-<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
-    <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
-        <h1>Users</h1>
+                        </EditForm>
 
-        <p>
-            <a class="btn btn-info text-light" href="/suppliers/create">Create New</a>
-        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div style="width:100%;overflow:auto;">
+        <table class="table" style="width:100%;margin:0 0 1rem 0;border-spacing: 15px 20px; min-width:600px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:10px;">Image</th>
+                    <th style="text-align:left;padding:10px;">Fullname</th>
+                    <th style="text-align:left;padding:10px;">Email</th>
+                    <th style="text-align:left;padding:10px;">Password</th>
+                    <th style="text-align:left;padding:10px;">Contact Number</th>
+                    <th style="text-align:left;padding:10px;">Address</th>
+                    <th style="text-align:left;padding:10px;">Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var user in ColUsers)
+                    {
+                        <tr>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;"><img style="width:90px;height:90px;object-fit:cover;border-radius:50%;" src="@(user.ImagePath)" /></td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">@user.Fullname</td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
+                                @user.Email
+                            </td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
+                                @user.PasswordHash
+                            </td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
+                                @user.ContactNumber
+                            </td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
+                                @user.Address
+                            </td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
+                                @(Roles.SingleOrDefault(i => i.UserId == user.Id) != null ? Roles.SingleOrDefault(i => i.UserId == user.Id).Name : "No Role")
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" style="width:100%;height:40px;border:2px solid #2342C0;border-radius:6px;background-color:transparent;display:flex;flex-direction:row;justify-content:center;align-items:center;cursor:pointer;padding:0 2rem;color:#2342C0"
+                                        @onclick="(() => EditUser(user))">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                
+            </tbody>
+        </table>
     </div>
 
 
-    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
-        <thead style="background-color:#7C738F;">
-            <tr class="border-1 border-dark">
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Fullname</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Email</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Contact Number</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Password</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Address</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Role</th>
-                <th style="color:white;padding:8px 0 8px 8px;text-align:start;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                var user = from peep in DB.Users
-                           join userrole in DB.UserRoles on peep.Id equals userrole.UserId
-                           join role in DB.Roles on userrole.RoleId equals role.Id
-                           select new
-                           {
-                               Id = peep.Id,
-                               Fullname = peep.Fullname,
-                               Email = peep.Email,
-                               ContactNumber = peep.ContactNumber,
-                               Password = peep.PasswordHash,
-                               Address = peep.Address,
-                               Role = role.Name
-                           };
-            }
-            @foreach (var i in user)
-            {
-                <tr style="border:1px solid black;">
-                    <td style="text-align:start;">
-                        @i.Fullname
-                    </td>
-                    <td style="text-align:start;">
-                        @i.Email
-                    </td>
-                    <td style="text-align:start;">
-                        @i.ContactNumber
-                    </td>
-                    <td style="text-align:start;">
-                        *******
-                    </td>
-                    <td style="text-align:start;">
-                        @i.Address
-                    </td>
-                    <td style="text-align:start;">
-                        @(i.Role != null? i.Role : i.Role)
-                    </td>
-                    <td style="text-align:start;">
-                        <a href="@($"users/edit?id={i.Id}")"><img src="edit-icon.png" /></a> |
-                        <a href="@($"users/details?id={i.Id}")">Details</a> |
-                        <a href="@($"users/delete?id={i.Id}")"><img src="remove-icon.png" /></a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
 
 </div>
 
-@code{
-    List<ApplicationUser> Users { get; set; } = new();
+@code {
+
+
+    [Parameter]
+    public string? style { get; set; }
+
+    private IEnumerable<IdentityError>? identityErrors;
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    string action = "";
+
+    // Property used to add or edit the currently selected user
+    ApplicationUser objUser = new ApplicationUser();
+    // Tracks the selected role for the currently selected user
+    string CurrentUserRole { get; set; } = "Select Role";
+    // Collection to display the existing users
+    List<ApplicationUser> ColUsers = new List<ApplicationUser>();
+    // Options to display in the roles dropdown when editing a user
+    List<string> Options = new List<string>() { "Admin", "Staff" };
+
+    string ORGANIZER_ROLE = "Admin";
+    string JUDGE_ROLE = "Staff";
+
+    // To enable showing the Popup
+    bool ShowPopup = false;
+    //File Upload
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 1024 * 5;
+    private int maxAllowedFiles = 1;
+    private bool isLoading;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var fileExtension = Path.GetExtension(file.Name);
+                var allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif" };
+                if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                {
+                    throw new InvalidOperationException("Unsupported file type.");
+                }
+
+                var trustedFileName = Path.GetRandomFileName() + fileExtension;
+                var path = Path.Combine(Environment.WebRootPath, "uploads", trustedFileName);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+                loadedFiles.Add(file);
+
+                var relativePath = Path.Combine("uploads", trustedFileName);
+                objUser.ImagePath = relativePath; // Store the relative path for use in the UI
+
+                Logger.LogInformation(
+                    "Unsafe Filename: {UnsafeFilename} File saved: {Filename}",
+                    file.Name, trustedFileName);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("File: {Filename} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    List<roleObject>? Roles = new();
+
+    class roleObject
+    {
+        public string? Name { get; set; }
+        public string? UserId { get; set; }
+    }
 
     protected override void OnInitialized()
     {
-        Users = DB.Users.ToList();
+        GetUsers();
+
+        var roles = from userrole in db.UserRoles
+                    join role in db.Roles on userrole.RoleId equals role.Id
+                    select new
+                    {
+                        role.Name,
+                        userrole.UserId
+                    };
+        foreach (var role in roles)
+        {
+            var RO = new roleObject()
+            {
+                Name = role.Name,
+                UserId = role.UserId
+            };
+
+            Roles.Add(RO);
+        }
     }
+
+    public async Task GetUsers()
+    {
+        identityErrors = null;
+
+        // Collection to hold users
+        ColUsers = new List<ApplicationUser>();
+        // get users from _UserManager
+        var user = db.Users.Select(x => new ApplicationUser
+            {
+                ImagePath = x.ImagePath,
+                Fullname = x.Fullname,
+                Id = x.Id,
+                Email = x.Email,
+                ContactNumber = x.ContactNumber,
+                Address = x.Address,
+                PasswordHash = "******",
+            });
+        foreach (var item in user)
+        {
+            ColUsers.Add(item);
+        }
+    }
+
+    public async Task SaveUser()
+    {
+        // Is this an existing user?
+        if (objUser.Id != "")
+        {
+            // Get the user
+            var user = await UserManager.FindByIdAsync(objUser.Id);
+
+
+            // Only update password if the current value
+            // is not the default value
+            if (objUser.PasswordHash != "*****")
+            {
+                // Update Email
+                user.Email = objUser.Email;
+                user.ImagePath = objUser.ImagePath;
+                user.Fullname = objUser.Fullname;
+                user.ContactNumber = objUser.ContactNumber;
+                user.Address = objUser.Address;
+                // Update the user
+                await UserManager.UpdateAsync(user);
+
+                var resetToken =
+                    await UserManager.GeneratePasswordResetTokenAsync(user);
+                var result =
+                    await UserManager.ResetPasswordAsync(
+                        user,
+                        resetToken,
+                        objUser.PasswordHash);
+
+
+                if (!result.Succeeded)
+                {
+                    identityErrors = result.Errors;
+                    // Keep the popup opened
+                    return;
+                }
+
+
+            }
+            // Handle Roles
+            // Is user in ORGANIZER_ROLE role?
+            var UserResult =
+                await UserManager
+                .IsInRoleAsync(user, ORGANIZER_ROLE);
+            // Is ORGANIZER_ROLE role selected
+            // but user is not an ORGANIZER_ROLE?
+            if (
+                (CurrentUserRole == ORGANIZER_ROLE)
+                &
+                (!UserResult))
+            {
+                await UserManager
+                    .RemoveFromRoleAsync(user, JUDGE_ROLE);
+                // Put user in ORGANIZER_ROLE role
+                await UserManager
+                    .AddToRoleAsync(user, ORGANIZER_ROLE);
+            }
+            else
+            {
+                // Is ORGANIZER_ROLE role not selected
+                // but user is an ORGANIZER_ROLE?
+                if ((CurrentUserRole != ORGANIZER_ROLE)
+                    &
+                    (UserResult))
+                {
+                    // Remove user from Administrator role
+                    await UserManager
+                        .RemoveFromRoleAsync(user, ORGANIZER_ROLE);
+                    await UserManager
+                         .AddToRoleAsync(user, JUDGE_ROLE);
+
+                }
+            }
+
+        }
+        else
+        {
+            var new_user = CreateUser();
+
+            await UserStore.SetUserNameAsync(new_user, objUser.Email, CancellationToken.None);
+            var emailStore = GetEmailStore();
+            await emailStore.SetEmailAsync(new_user, objUser.Email, CancellationToken.None);
+            new_user.ImagePath = objUser.ImagePath;
+            new_user.Fullname = objUser.Fullname;
+            new_user.ContactNumber = objUser.ContactNumber;
+            new_user.Address = objUser.Address;
+            var result = await UserManager.CreateAsync(new_user, objUser.PasswordHash);
+
+            if (result.Succeeded)
+            {
+                // Handle Roles
+                if (CurrentUserRole == ORGANIZER_ROLE)
+                {
+                    // Put user in ORGANIZER_ROLE role
+                    await UserManager
+                        .AddToRoleAsync(new_user, ORGANIZER_ROLE);
+                }
+                if (CurrentUserRole == JUDGE_ROLE)
+                {
+                    // Put user in JUDGE_ROLE role
+                    await UserManager
+                        .AddToRoleAsync(new_user, JUDGE_ROLE);
+                }
+
+            }
+            else
+            {
+                identityErrors = result.Errors;
+                return;
+            }
+
+
+        }
+
+        // Close the Popup
+        ShowPopup = false;
+        // Refresh Users
+        GetUsers();
+    }
+
+    async Task EditUser(ApplicationUser _IdentityUser)
+    {
+        // Set the selected user
+        // as the current user
+        objUser = _IdentityUser;
+        // Get the user
+        var user = await UserManager.FindByIdAsync(objUser.Id);
+
+        if (user != null)
+        {
+            // Is user in administrator role?
+            var UserResult =
+                await UserManager
+                .IsInRoleAsync(user, ORGANIZER_ROLE);
+            if (UserResult)
+            {
+                CurrentUserRole = ORGANIZER_ROLE;
+            }
+            else
+            {
+                CurrentUserRole = JUDGE_ROLE;
+            }
+        }
+        // Open the Popup
+        ShowPopup = true;
+        action = "Edit User";
+    }
+    async Task DeleteUser()
+    {
+
+        // Close the Popup
+        ShowPopup = false;
+        // Get the user
+        var user = await UserManager.FindByIdAsync(objUser.Id);
+        if (user != null)
+        {
+            // Delete the user
+            var result = await UserManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Unexpected error occurred deleting user.");
+            }
+        }
+        // Refresh Users
+        GetUsers();
+    }
+    void ClosePopup()
+    {
+        // Close the Popup
+        ShowPopup = false;
+    }
+
+    void AddNewUser()
+    {
+        // Make new user
+        objUser = CreateUser();
+        objUser.PasswordHash = "";
+        // Set Id to blank so we know it is a new record
+        objUser.Id = "";
+        // Open the Popup
+        ShowPopup = true;
+        action = "Add User";
+    }
+
+
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
 }

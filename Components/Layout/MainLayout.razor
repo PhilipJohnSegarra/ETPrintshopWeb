@@ -1,5 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
+@using ETPrintshopWeb.Data
+@using ETPrintshopWeb.Components.Account
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavManager
+@inject IdentityUserAccessor UserAccessor
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@inject IdentityUserAccessor UserAccessor
+@inject UserService UserService
 <div class="page" style="height:100vh;overflow:hidden;">
     <div class="sidebar" style="overflow:auto;">
         <NavMenu />
@@ -7,10 +19,18 @@
 
     <main style="overflow:auto;background-color:#DDD8D8;">
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if(user != null)
+            {
+                <a href=""><img style="width:50px;height:50px;object-fit:cover;margin:0 1rem 0 0;" src="@(user.ImagePath)" />@(user.Fullname != null? user.Fullname : user.Email)</a>
+            }
+            else
+            {
+                <a href="Account/Login">Log In</a>
+            }
+            
         </div>
 
-        <article class="content px-4" style="background-color:#DDD8D8;height:100%;padding:1rem 0 3rem 0;overflow:auto;">
+        <article class="content px-4" style="background-color:#DDD8D8;min-height:100%;padding:1rem 0 3rem 0;">
             @Body
         </article>
     </main>
@@ -21,3 +41,20 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code{
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [Parameter]
+    public ApplicationUser? user { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+    }
+}
