@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <PageTitle>Index</PageTitle>
 
@@ -61,9 +64,9 @@
     List<PurchaseOrder> PurchaseOrders { get; set; } = new();
     List<Supplier> Suppliers { get; set; } = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        PurchaseOrders = DB.PurchaseOrders.ToList();
-        Suppliers = DB.Suppliers.ToList();
+        PurchaseOrders = await DB.PurchaseOrders.ToListAsync();
+        Suppliers = await DB.Suppliers.ToListAsync();
     }
 }

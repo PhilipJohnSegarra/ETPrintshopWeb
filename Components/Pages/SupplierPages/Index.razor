@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <PageTitle>Index</PageTitle>
 
@@ -30,7 +33,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var supplier in DB.Suppliers)
+            @foreach (var supplier in Suppliers)
             {
                 <tr style="border:1px solid black;">
                     <td style="text-align:center;">
@@ -65,3 +68,12 @@
     </table>
 
 </div>
+
+@code{
+    List<Supplier> Suppliers { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Suppliers = await DB.Suppliers.ToListAsync();
+    }
+}

@@ -12,6 +12,7 @@
 @inject ETPrintshopWeb.Data.ApplicationDbContext DB
 @inject IdentityUserAccessor UserAccessor
 @inject UserService UserService
+@attribute [Authorize]
 <div class="page" style="height:100vh;overflow:hidden;">
     <div class="sidebar" style="overflow:auto;">
         <NavMenu />
@@ -21,7 +22,7 @@
         <div class="top-row px-4">
             @if(user != null)
             {
-                <a href=""><img style="width:50px;height:50px;object-fit:cover;margin:0 1rem 0 0;" src="@(user.ImagePath)" />@(user.Fullname != null? user.Fullname : user.Email)</a>
+                <a href="@($"/users/edit/id={user.Id}")"><img style="width:50px;height:50px;object-fit:cover;margin:0 1rem 0 0;border-radius:50%;" src="@(user.ImagePath)" />@(user.Fullname != null ? user.Fullname : user.Email)</a>
             }
             else
             {
