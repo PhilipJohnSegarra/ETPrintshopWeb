@@ -1,0 +1,96 @@
+﻿@page "/Sales/edit"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Sale</h4>
+<hr />
+@if (Sale is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Sale" OnValidSubmit="UpdateSale" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Sale.Id" value="@Sale.Id" />
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <InputDate id="date" @bind-Value="Sale.Date" class="form-control" />
+                    <ValidationMessage For="() => Sale.Date" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="Sale.Quantity" class="form-control" />
+                    <ValidationMessage For="() => Sale.Quantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="totalamount" class="form-label">TotalAmount:</label>
+                    <InputNumber id="totalamount" @bind-Value="Sale.TotalAmount" class="form-control" />
+                    <ValidationMessage For="() => Sale.TotalAmount" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/sales">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Sale? Sale { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Sale ??= await DB.Sales.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Sale is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateSale()
+    {
+        DB.Attach(Sale!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SaleExists(Sale!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/sales");
+    }
+
+    bool SaleExists(int? id)
+    {
+        return DB.Sales.Any(e => e.Id == id);
+    }
+}

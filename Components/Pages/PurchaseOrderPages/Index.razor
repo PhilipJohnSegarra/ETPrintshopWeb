@@ -83,6 +83,19 @@
         <tbody>
             @foreach (var po in PurchaseOrders)
             {
+                string style = "";
+                switch (po.Status)
+                {
+                    case "Approved":
+                        style = "background-color:green;color:white;";
+                        break;
+                    case "Declined":
+                        style = "background-color:gray;color:white;";
+                        break;
+                    case "Pending":
+                        style = "background-color:yellow;color:black;";
+                        break;
+                }
                 <tr style="border:1px solid black;">
                     <td style="text-align:center;">
                         PO&#8211;000@(po.Id)
@@ -96,7 +109,7 @@
                     <td style="text-align:center;">
                         @(PurchaseOrderItems.Where(i => i.PurchaseOrder == po).Count())
                     </td>
-                    <td style="text-align:center;">
+                    <td style="text-align:center;@style">
                         @po.Status
                     </td>
                     <td style="text-align:center;">

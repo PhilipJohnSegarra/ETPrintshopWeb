@@ -130,7 +130,7 @@
                     foreach (var user in ColUsers)
                     {
                         <tr>
-                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;"><img style="width:90px;height:90px;object-fit:cover;border-radius:50%;" src="@(user.ImagePath)" /></td>
+                            <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;"><img style="width:90px;height:90px;object-fit:cover;border-radius:50%;border:1px solid black;" src="@(user.ImagePath != null? user.ImagePath : "person-default.png")" /></td>
                             <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">@user.Fullname</td>
                             <td style="text-align:left;padding:10px;border:1px solid black;border-radius:10px;">
                                 @user.Email

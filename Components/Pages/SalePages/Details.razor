@@ -1,0 +1,49 @@
+﻿@page "/sales/details"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Sale</h4>
+    <hr />
+    @if (sale is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Date</dt>
+            <dd class="col-sm-10">@sale.Date</dd>
+            <dt class="col-sm-2">Quantity</dt>
+            <dd class="col-sm-10">@sale.Quantity</dd>
+            <dt class="col-sm-2">TotalAmount</dt>
+            <dd class="col-sm-10">@sale.TotalAmount</dd>
+        </dl>
+        <div>
+            <a href="@($"/sales/edit?id={sale.Id}")">Edit</a> |
+            <a href="@($"/sales")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Sale? sale;
+
+    [SupplyParameterFromQuery]
+    public int? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        sale = await DB.Sales.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (sale is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,102 @@
+﻿@page "/sales/create"
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Sale</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Sale" OnValidSubmit="AddSale" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label> 
+                <InputDate id="date" @bind-Value="Sale.Date" class="form-control" /> 
+                <ValidationMessage For="() => Sale.Date" class="text-danger" /> 
+            </div>
+            <div class="mb-3">
+                <label for="product" class="form-label">Product:</label>
+                <InputSelect id="product" @bind-Value="Sale.ProductId" class="form-control">
+                    <option value="">
+                        Select Products
+                    </option>
+                    @foreach(var product in Products)
+                    {
+                        <option value="@product.Id">
+                            @product.Name
+                        </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Sale.Product" class="text-danger" />
+            </div>
+            @if(Sale.ProductId != null)
+            {
+                Product = Products.SingleOrDefault(i => i.Id == Sale.ProductId);
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="Sale.Quantity" @oninput="UpdateTotal" class="form-control" />
+                    <h6 class="text-danger">@QuantityError</h6>
+                </div>
+                <div class="mb-3">
+                    <label for="totalamount" class="form-label">Total Amount:</label>
+                    <input readonly="true" id="totalamount" value="@(Sale.Quantity * Product.Price)" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            }           
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/sales">Back to List</a>
+</div>
+
+@code {
+    public Sale Sale { get; set; } = new();
+    List<Product> Products { get; set; } = new();
+
+    int? Quantity { get; set; }
+    Product Product { get; set; } = new();
+
+    double? TotalAmount { get; set; }
+
+    string QuantityError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await DB.Products.ToListAsync();
+    }
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddSale()
+    {
+        if(Sale.Quantity <= Product.Stocks)
+        {
+            Sale.TotalAmount = Sale.Quantity * Product.Price;
+            DB.Sales.Add(Sale);
+            Product.Stocks -= Sale.Quantity;
+            DB.Products.Update(Product);
+            await DB.SaveChangesAsync();
+            QuantityError = "";
+            NavigationManager.NavigateTo("/sales");
+        }
+        else if (Sale.Quantity > Product.Stocks)
+        {
+            QuantityError = $"Quantity Should not Exceed Available Stocks({Product.Name}: {Product.Stocks})";
+        }
+
+
+    }
+    void UpdateTotal()
+    {
+        StateHasChanged();
+        TotalAmount = Sale.Quantity * Product.Price;
+    }
+}

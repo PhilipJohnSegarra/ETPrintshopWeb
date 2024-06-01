@@ -11,5 +11,6 @@ namespace ETPrintshopWeb.Data
         public DbSet<RequisitionForm> RequisitionForms { get; set; } = default!;
         public DbSet<RequisitionItem> RequisitionItems { get; set; } = default!;
         public DbSet<Supplier> Suppliers { get; set; } = default!;
+        public DbSet<Sale> Sales { get; set; } = default!;
     }
 }

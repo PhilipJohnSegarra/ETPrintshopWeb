@@ -5,16 +5,37 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" media='all' />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="ETPrintshopWeb.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+
+    <script src="pdfExport.js"></script>
     <HeadOutlet />
 </head>
 
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.printDiv = (divId,
+            title) => {
+
+            let mywindow = window.open('', 'PRINT', 'height=650,width=1000,top=100,left=150');
+
+            mywindow.document.write(document.getElementById(divId).innerHTML);
+
+            mywindow.document.close(); // necessary for IE >= 10
+            mywindow.focus(); // necessary for IE >= 10*/
+
+            mywindow.print();
+            mywindow.close();
+
+            return true;
+        }
+    </script>
 </body>
 
 </html>

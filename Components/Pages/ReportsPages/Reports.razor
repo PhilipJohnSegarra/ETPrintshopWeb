@@ -1,0 +1,96 @@
+﻿@page "/reports"
+@rendermode InteractiveServer
+@using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DB
+
+
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
+    <h1>Sales Reports</h1>
+    <div class="container-fluid d-flex flex-row justify-content-start align-items-center mb-3">
+        <div class="d-flex flex-column justify-content-start align-items-start me-5">
+            <h3>From:</h3>
+            <input type="date" @bind-value="startdate"/>
+        </div>
+        <div class="d-flex flex-column justify-content-start align-items-start">
+            <h3>To:</h3>
+            <input type="date" @bind-value="enddate" />
+        </div>
+    </div>
+
+
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
+        <thead style="background-color:#7C738F;">
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Date</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Product</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Price</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Quantity</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Total Amount</th>
+                <AuthorizeView Roles="Admin"><th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th></AuthorizeView>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rf in Sales.Where(i => i.Date >= startdate && i.Date <= enddate))
+            {
+                <tr style="border:1px solid black;">
+                    <td style="text-align:center;">
+                        @rf.Date
+                    </td>
+                    <td style="text-align:center;">
+                        @(Products.SingleOrDefault(i => i.Id == rf.ProductId).Name)
+                    </td>
+                    <td style="text-align:center;">
+                        @(Products.SingleOrDefault(i => i.Id == rf.ProductId).Price)
+                    </td>
+                    <td style="text-align:center;">
+                        @rf.Quantity
+                    </td>
+                    <td style="text-align:center;">
+                        &#8369;@rf.TotalAmount
+                    </td>
+                    <td style="text-align:center;">
+                        <AuthorizeView Roles="Admin">
+                            <a href="@($"sales/edit?id={rf.Id}")"><img src="edit-icon.png" /></a>
+                            <a href="@($"sales/details?id={rf.Id}")">Details</a> |
+                            <a href="@($"sales/delete?id={rf.Id}")"><img src="remove-icon.png" /></a>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:center;">
+                    
+                </td>
+                <td style="text-align:center;">
+                    
+                </td>
+                <td style="text-align:center;">
+                    
+                </td>
+                <td style="text-align:center;">
+                    
+                </td>
+                <td style="text-align:center;">
+                    <strong>Total Revenue:</strong>
+                </td>
+                <td style="text-align:center;">
+                    &#8369;@Sales.Where(i => i.Date >= startdate && i.Date <= enddate).Sum(i => i.TotalAmount)
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+@code
+{
+    List<Sale> Sales { get; set; } = new();
+    List<Product> Products { get; set; } = new();
+    DateTime startdate { get; set; }
+    DateTime enddate { get; set; } = DateTime.Now.Date;
+    protected override async Task OnInitializedAsync()
+    {
+        Sales = await DB.Sales.ToListAsync();
+        Products = await DB.Products.ToListAsync();
+    }
+}

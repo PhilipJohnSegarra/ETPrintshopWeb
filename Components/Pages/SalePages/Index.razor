@@ -1,0 +1,88 @@
+﻿@page "/sales"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ETPrintshopWeb.Data.ApplicationDbContext DB
+@using ETPrintshopWeb.Data
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Index</PageTitle>
+
+@* <h1>Index</h1>
+
+<p>
+    <a href="sales/create">Create New</a>
+</p> *@
+
+@* <QuickGrid Class="table" Items="Sales">
+    <PropertyColumn Property="sale => sale.Date" />
+    <PropertyColumn Property="sale => sale.Quantity" />
+    <PropertyColumn Property="sale => sale.TotalAmount" />
+
+    <TemplateColumn Context="sale">
+        <a href="@($"sales/edit?id={sale.Id}")">Edit</a> |
+        <a href="@($"sales/details?id={sale.Id}")">Details</a> |
+        <a href="@($"sales/delete?id={sale.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid> *@
+<div class="container-fluid" style="width:95%;height:auto;min-height:100%;background-color:white;padding:2rem;overflow:auto;">
+    <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
+        <h1>Sales</h1>
+        <p>
+            <a class="btn btn-info text-light" href="sales/create">Create New</a>
+
+        </p>
+    </div>
+
+
+    <table class="container-fluid table table-borderless" style="border-spacing:0 10px;min-width:900px;">
+        <thead style="background-color:#7C738F;">
+            <tr class="border-1 border-dark">
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Date</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Product</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Price</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Quantity</th>
+                <th style="color:white;padding:8px 0 8px 8px;text-align:center;">Total Amount</th>
+                <AuthorizeView Roles="Admin"><th style="color:white;padding:8px 0 8px 8px;text-align:center;">Action</th></AuthorizeView>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rf in Sales)
+            {
+                <tr style="border:1px solid black;">
+                    <td style="text-align:center;">
+                        @rf.Date
+                    </td>
+                    <td style="text-align:center;">
+                        @(Products.SingleOrDefault(i => i.Id == rf.ProductId).Name)
+                    </td>
+                    <td style="text-align:center;">
+                        @(Products.SingleOrDefault(i => i.Id == rf.ProductId).Price)
+                    </td>
+                    <td style="text-align:center;">
+                        @rf.Quantity
+                    </td>
+                    <td style="text-align:center;">
+                        &#8369; @rf.TotalAmount
+                    </td>
+                    <td style="text-align:center;">
+                        <AuthorizeView Roles="Admin">
+                            <a href="@($"sales/edit?id={rf.Id}")"><img src="edit-icon.png" /></a>
+                            <a href="@($"sales/details?id={rf.Id}")">Details</a> |
+                            <a href="@($"sales/delete?id={rf.Id}")"><img src="remove-icon.png" /></a>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+@code
+{
+    List<Sale> Sales { get; set; } = new();
+    List<Product> Products { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        Sales = await DB.Sales.ToListAsync();
+        Products = await DB.Products.ToListAsync();
+    }
+}
