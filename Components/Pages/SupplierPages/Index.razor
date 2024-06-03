@@ -59,7 +59,7 @@
                         @supplier.Status
                     </td>
                     <td style="text-align:center;">
-                        @supplier.DateAdded
+                        @(supplier.DateAdded != null ? supplier.DateAdded.Value.ToShortDateString() : null)
                     </td>
                     <AuthorizeView Roles="Admin">
                         <td style="text-align:center;">

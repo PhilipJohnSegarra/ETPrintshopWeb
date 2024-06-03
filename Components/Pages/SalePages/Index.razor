@@ -49,7 +49,7 @@
             {
                 <tr style="border:1px solid black;">
                     <td style="text-align:center;">
-                        @rf.Date
+                        @(rf.Date != null? rf.Date.Value.ToShortDateString() : null)
                     </td>
                     <td style="text-align:center;">
                         @(Products.SingleOrDefault(i => i.Id == rf.ProductId).Name)
