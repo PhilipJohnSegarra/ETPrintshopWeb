@@ -72,6 +72,14 @@
 
     public async Task DeletePurchaseOrder()
     {
+        var items = DB.PurchaseOrderItems.Where(i => i.PurchaseOrder == purchaseorder).ToList();
+        if(items != null)
+        {
+            foreach(var item in items)
+            {
+                DB.PurchaseOrderItems.Remove(item);
+            }
+        }
         DB.PurchaseOrders.Remove(purchaseorder!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/purchaseorders");

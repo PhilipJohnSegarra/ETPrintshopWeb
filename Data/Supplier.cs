@@ -16,6 +16,7 @@ namespace ETPrintshopWeb.Data
         public string? Status { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime? DateAdded { get; set; } = DateTime.Now.Date;
+        public bool? IsDeleted { get; set; }
 
     }
 }

@@ -56,6 +56,7 @@
     [SupplyParameterFromQuery]
     public int? Id { get; set; }
 
+
     protected override async Task OnInitializedAsync()
     {
         requisitionform = await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
@@ -68,6 +69,14 @@
 
     public async Task DeleteRequisitionForm()
     {
+        var items = DB.RequisitionItems.Where(i => i.RequisitionForm == requisitionform).ToList();
+        if(items != null)
+        {
+            foreach (var item in items)
+            {
+                DB.RequisitionItems.Remove(item);
+            }
+        }
         DB.RequisitionForms.Remove(requisitionform!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/requisitionforms");

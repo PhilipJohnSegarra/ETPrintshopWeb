@@ -55,7 +55,7 @@
                     <option value="">
                         Select Supplier
                     </option>
-                    @foreach (var supp in Suppliers)
+                    @foreach (var supp in Suppliers.Where(i => i.IsDeleted != true))
                     {
                         <option value="@supp.Id">
                             @supp.Name

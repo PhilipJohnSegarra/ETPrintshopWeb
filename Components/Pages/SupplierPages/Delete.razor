@@ -72,7 +72,8 @@
 
     public async Task DeleteSupplier()
     {
-        DB.Suppliers.Remove(supplier!);
+        supplier!.IsDeleted = true;
+        DB.Suppliers.Update(supplier!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/suppliers");
     }
