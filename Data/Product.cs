@@ -16,5 +16,6 @@ namespace ETPrintshopWeb.Data
         public double? Price { get; set; }
         public Supplier? Supplier { get; set; }
         public int? SupplierId { get; set; }
+        public bool? IsDeleted { get; set; }
     }
 }

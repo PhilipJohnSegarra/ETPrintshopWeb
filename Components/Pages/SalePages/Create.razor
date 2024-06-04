@@ -27,7 +27,7 @@
                     <option value="">
                         Select Products
                     </option>
-                    @foreach(var product in Products)
+                    @foreach(var product in Products.Where(i => i.IsDeleted != true))
                     {
                         <option value="@product.Id">
                             @product.Name

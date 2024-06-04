@@ -68,7 +68,8 @@
 
     public async Task DeleteProduct()
     {
-        DB.Products.Remove(product!);
+        product!.IsDeleted = true;
+        DB.Products.Update(product!);
         await DB.SaveChangesAsync();
         NavigationManager.NavigateTo("/products");
     }
