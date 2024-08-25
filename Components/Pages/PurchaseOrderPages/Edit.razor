@@ -5,6 +5,8 @@
 @using Microsoft.EntityFrameworkCore
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
@@ -24,7 +26,7 @@ else
             <h4>Purchase Order</h4>
             <hr />
             <EditForm method="post" Model="PurchaseOrder" OnValidSubmit="UpdatePurchaseOrder" FormName="create" Enhance style="width:100%;">
-                @if (PurchaseOrder.Status == "Pending")
+                @if (PurchaseOrder.Status == "Pending" && userRole == "Admin")
                 {
                     string declineText = "Decline";
                     string approveText = "Approve";
@@ -173,6 +175,8 @@ else
     List<PurchaseOrderItem> RemovedItems { get; set; } = new();
     List<Supplier> Suppliers { get; set; } = new();
 
+    private string userRole;
+
     protected override async Task OnInitializedAsync()
     {
         PurchaseOrder ??= await DB.PurchaseOrders.FirstOrDefaultAsync(m => m.Id == Id);
@@ -184,6 +188,14 @@ else
         if (PurchaseOrder is null)
         {
             NavigationManager.NavigateTo("notfound");
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            userRole = user.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
         }
     }
 

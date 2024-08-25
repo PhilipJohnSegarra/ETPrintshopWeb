@@ -78,9 +78,7 @@
                             </div>
                             <div class="Register-inputbox" style="width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
                                 <InputSelect @bind-Value="@CurrentUserRole" class="form-control" style="padding:9px; border-radius:6px;margin:0 0 8px 0;width:100%;max-width:500px;">
-                                    <option style="padding: 1rem 0 1rem 0;" value="Select Role">
-                                        Select Role
-                                    </option>
+                                    
                                     @foreach (var option in Options)
                                     {
                                         <option style="padding: 1rem 0 1rem 0;" value="@option">
@@ -181,7 +179,7 @@
     // Property used to add or edit the currently selected user
     ApplicationUser objUser = new ApplicationUser();
     // Tracks the selected role for the currently selected user
-    string CurrentUserRole { get; set; } = "Select Role";
+    string CurrentUserRole { get; set; } = "Admin";
     // Collection to display the existing users
     List<ApplicationUser> ColUsers = new List<ApplicationUser>();
     // Options to display in the roles dropdown when editing a user
@@ -340,36 +338,38 @@
             // Is user in ORGANIZER_ROLE role?
             var UserResult =
                 await UserManager
-                .IsInRoleAsync(user, ORGANIZER_ROLE);
+                .GetRolesAsync(user);
             // Is ORGANIZER_ROLE role selected
             // but user is not an ORGANIZER_ROLE?
-            if (
-                (CurrentUserRole == ORGANIZER_ROLE)
-                &
-                (!UserResult))
+            if (UserResult.Any())
             {
                 await UserManager
-                    .RemoveFromRoleAsync(user, JUDGE_ROLE);
+                    .RemoveFromRoleAsync(user, UserResult.ToArray()[0]);
                 // Put user in ORGANIZER_ROLE role
                 await UserManager
-                    .AddToRoleAsync(user, ORGANIZER_ROLE);
+                    .AddToRoleAsync(user, CurrentUserRole);
             }
-            else
+            else if (!UserResult.Any())
             {
-                // Is ORGANIZER_ROLE role not selected
-                // but user is an ORGANIZER_ROLE?
-                if ((CurrentUserRole != ORGANIZER_ROLE)
-                    &
-                    (UserResult))
-                {
-                    // Remove user from Administrator role
-                    await UserManager
-                        .RemoveFromRoleAsync(user, ORGANIZER_ROLE);
-                    await UserManager
-                         .AddToRoleAsync(user, JUDGE_ROLE);
-
-                }
+                await UserManager
+                    .AddToRoleAsync(user, CurrentUserRole);
             }
+            // else
+            // {
+            //     // Is ORGANIZER_ROLE role not selected
+            //     // but user is an ORGANIZER_ROLE?
+            //     if ((CurrentUserRole != ORGANIZER_ROLE)
+            //         &
+            //         (UserResult) || (!UserResult))
+            //     {
+            //         // Remove user from Administrator role
+            //         await UserManager
+            //             .RemoveFromRoleAsync(user, UserResult[0]);
+            //         await UserManager
+            //              .AddToRoleAsync(user, JUDGE_ROLE);
+
+            //     }
+            // }
 
         }
         else

@@ -5,6 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
@@ -104,7 +105,7 @@ else
                     </div>
                     <div class="container-fluid d-flex flex-row justify-content-between">
                         <a class="btn btn-outline-dark text-decoration-none" href="/requisitionforms">Cancel</a>
-                        @if (RequisitionForm.Status == "Pending")
+                        @if (RequisitionForm.Status == "Pending" && userRole == "Admin")
                         {
                             string declineText = "Decline";
                             string approveText = "Approve";
@@ -138,6 +139,8 @@ else
     public List<RequisitionItem> Items { get; set; } = new();
     public List<RequisitionItem> RemovedItems { get; set; } = new();
 
+    private string userRole;
+
     protected override async Task OnInitializedAsync()
     {
         RequisitionForm ??= await DB.RequisitionForms.FirstOrDefaultAsync(m => m.Id == Id);
@@ -148,6 +151,14 @@ else
         if (RequisitionForm is null)
         {
             NavigationManager.NavigateTo("notfound");
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            userRole = user.FindFirst(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
         }
     }
 
