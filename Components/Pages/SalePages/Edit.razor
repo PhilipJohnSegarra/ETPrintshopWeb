@@ -22,6 +22,7 @@ else
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <input type="hidden" name="Sale.Id" value="@Sale.Id" />
+                <input type="hidden" name="Sale.ProductId" value="@Sale.ProductId" />
                 <div class="mb-3">
                     <label for="date" class="form-label">Date:</label>
                     <InputDate id="date" @bind-Value="Sale.Date" class="form-control" />
@@ -41,6 +42,7 @@ else
             </EditForm>
         </div>
     </div>
+    
 }
 
 <div>
@@ -54,9 +56,12 @@ else
     [SupplyParameterFromForm]
     public Sale? Sale { get; set; }
 
+    int? productId { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
         Sale ??= await DB.Sales.FirstOrDefaultAsync(m => m.Id == Id);
+        productId = Sale!.ProductId;
 
         if (Sale is null)
         {
@@ -68,6 +73,7 @@ else
     // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task UpdateSale()
     {
+        
         DB.Attach(Sale!).State = EntityState.Modified;
 
         try
